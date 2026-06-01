@@ -18,6 +18,7 @@ Material **público** del proyecto **Vanilla Center Trust [VCT]**: bot de econom
 |---------|-------------|
 | [informes/Resumen_publico_v1.md](informes/Resumen_publico_v1.md) | Resumen para Patreon / nuevos ciudadanos |
 | [informes/Resumen_publico_v1.pdf](informes/Resumen_publico_v1.pdf) | Misma información en PDF |
+| [informes/anuncios/](informes/anuncios/) | Anuncios de actualización del bot (2.2, 2.4, 2.5…) para Discord |
 
 ## Apoyar el proyecto
 
