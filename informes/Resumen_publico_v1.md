@@ -7,7 +7,9 @@
 
 ## En una frase
 
-Bot de Discord que gestiona la **economía, reputación y trámites** de VCT: dinero legal, caja fuerte, dinero negro, nóminas por rangos, trabajos FS22, juegos, mercado negro y automatizaciones 24/7.
+Bot de Discord que gestiona la **economía, reputación y trámites** de VCT: dinero legal, caja fuerte, dinero negro, nóminas por rangos, trabajos FS22, juegos, mercado negro, tiendas interactivas, alarma/persecución/arresto y automatizaciones 24/7.
+
+**Última versión pública documentada:** **2.9.4** (parches de seguridad economía — Jun 2026).
 
 ---
 
@@ -18,7 +20,8 @@ Bot de Discord que gestiona la **economía, reputación y trámites** de VCT: di
 - Vincular **Farming Simulator 22**, ver perfil e historial; el staff registra **contratos** con recibo.  
 - **Robar**, **lavar** dinero negro, **mercado negro** e **inventario** (mecánica de rol).  
 - **Juegos**: trabajo rápido, submundo, trabajos comunitarios, rasca, dados, tragaperras, ruleta.  
-- Panel **/ticket**: crear contrato o pedir apelación.
+- Panel **/ticket**: crear contrato o pedir apelación.  
+- **Tiendas fijadas** en Discord (legal, especial, socio) + **alarma de seguridad**, **/perseguir** y **arresto** con fianza (v2.9.x).
 
 Al entrar al servidor recibes el rol **✅┃Ciudadano de VCT** y se genera tu **NRB** (número de registro bancario).
 
