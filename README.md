@@ -21,8 +21,18 @@ Material **público** del proyecto **Vanilla Center Trust [VCT]**: bot de econom
 |---------|-------------|
 | [informes/Resumen_publico_v1.md](informes/Resumen_publico_v1.md) | Resumen para Patreon / nuevos ciudadanos |
 | [informes/Resumen_publico_v1.pdf](informes/Resumen_publico_v1.pdf) | Misma información en PDF |
-| [informes/LISTA_COMANDOS_AUDITOR_VCT.md](informes/LISTA_COMANDOS_AUDITOR_VCT.md) | Lista de comandos slash (~88) |
+| [informes/LISTA_COMANDOS_AUDITOR_VCT.md](informes/LISTA_COMANDOS_AUDITOR_VCT.md) | Lista de comandos slash (~89) |
+| [**informes/Informe_completo_VCT.pdf**](informes/Informe_completo_VCT.pdf) | **Informe completo en PDF** (economía, comandos, FS22 — sin datos técnicos sensibles) |
+| [informes/Informe_completo_VCT.md](informes/Informe_completo_VCT.md) | Mismo informe en Markdown |
 | [informes/anuncios/](informes/anuncios/) | Anuncios de actualización (2.2 … **2.9.4**) |
+
+### Enlace directo para compartir el PDF
+
+```
+https://github.com/calero1989/App-Auditor-Bancario-Public/raw/main/informes/Informe_completo_VCT.pdf
+```
+
+(Tras publicar en GitHub: clic derecho → copiar enlace; sirve para Discord, WhatsApp, email o NotebookLM.)
 
 ## Apoyar el proyecto
 
