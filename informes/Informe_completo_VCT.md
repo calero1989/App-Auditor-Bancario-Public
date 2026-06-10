@@ -393,7 +393,90 @@ El Auditor Bancario es una aplicación **Python** que usa la API de **Discord** 
 
 ---
 
-## 15. Historial de evolución reciente
+## 15. Ejemplos de implementación (ilustrativos)
+
+Los fragmentos siguientes son **versiones depuradas** del código real. No incluyen tokens, IDs de canales Discord, rutas de servidor ni lógica criminal/admin completa. El código de producción permanece en el repositorio privado; en GitHub público están en la carpeta [`ejemplos/`](ejemplos/).
+
+### 15.1 Constantes de economía
+
+Las reglas descritas en las secciones 2–4 se codifican como constantes centralizadas:
+
+```python
+IMPUESTO_TRANSACCION = 0.05
+IMPUESTO_LAVADO = 0.15
+IMPUESTO_SEMANAL = 0.20
+NEGRO_CADUCIDAD_DIAS = 7
+ATRACO_EXITO_CHANCE = 0.35
+TRABAJOS_FS22 = {"hilerar": "Hilerar", "plantar": "Plantar", ...}
+PAGOS_TRABAJOS_FS22 = {"hilerar": 4000, "plantar": 5000, ...}
+```
+
+Archivo completo: `ejemplos/01_economia_constantes.py`
+
+### 15.2 Variables de entorno
+
+Secretos y IDs de guild se leen de `kofi.env` o del entorno del sistema, nunca del repositorio:
+
+```python
+def _cargar_variable_env(nombre: str, predeterminado: str = "") -> str:
+    valor = os.getenv(nombre)
+    if valor:
+        return valor.strip()
+    # ... leer kofi.env línea a línea ...
+    return predeterminado
+
+DISCORD_BOT_TOKEN = _cargar_variable_env("DISCORD_BOT_TOKEN")
+DISCORD_GUILD_ID = int(_cargar_variable_env("DISCORD_GUILD_ID", "0") or "0")
+```
+
+Archivo completo: `ejemplos/02_carga_variables_entorno.py` · Plantilla: `kofi.env.example`
+
+### 15.3 Guard de arresto en tiendas (v2.9.4)
+
+Antes de procesar un botón de tienda, se comprueba si el jugador está arrestado:
+
+```python
+async def bloquear_si_arrestado(interaction, banco) -> bool:
+    uid = str(interaction.user.id)
+    if uid not in banco or not esta_arrestado(banco[uid]):
+        return False
+    await interaction.response.send_message(MENSAJE_BLOQUEO_ARRESTO, ephemeral=True)
+    return True
+```
+
+Archivo completo: `ejemplos/03_guard_arresto_tiendas.py`
+
+### 15.4 Autocompletado FS22 (límite 25 de Discord)
+
+Con más de 25 tipos de trabajo, Discord no admite `choices` estáticas. Se usa autocompletado dinámico; `@tree.command` debe ir **antes** de `@autocomplete`:
+
+```python
+@tree.command(name="registrar_contrato_fs22", ...)
+@app_commands.autocomplete(tipo=_autocomplete_tipo_fs22)
+async def registrar_contrato_fs22(interaction, tipo: str):
+    ...
+```
+
+Archivo completo: `ejemplos/04_fs22_autocomplete.py`
+
+### 15.5 Lock de transacciones bancarias (v2.9.4)
+
+Todos los slash commands que mutan saldos se envuelven en un lock async para evitar double-spend:
+
+```python
+@asynccontextmanager
+async def transaccion_banco(*, persistir: bool = True):
+    async with bot._banco_lock:
+        yield bot
+        if persistir:
+            guardar_json_atomico(ruta_banco(), bot.banco)
+```
+
+Archivo completo: `ejemplos/05_lock_transacciones_banco.py`
+
+---
+
+## 16. Historial de evolución reciente
 
 | Versión | Tema |
 |---------|------|
@@ -407,7 +490,7 @@ El Auditor Bancario es una aplicación **Python** que usa la API de **Discord** 
 
 ---
 
-## 16. Inventario de comandos por categoría
+## 17. Inventario de comandos por categoría
 
 ### Información general
 `/version`, `/novedades`, `/tienda_vct`, `/verificar_socio_vct`, `/mis_pendientes_vct`
@@ -441,7 +524,7 @@ El Auditor Bancario es una aplicación **Python** que usa la API de **Discord** 
 
 ---
 
-## 17. Glosario rápido
+## 18. Glosario rápido
 
 | Término | Significado |
 |---------|-------------|
@@ -457,7 +540,7 @@ El Auditor Bancario es una aplicación **Python** que usa la API de **Discord** 
 
 ---
 
-## 18. Visión del proyecto
+## 19. Visión del proyecto
 
 1. **Presente** — Economía completa en Discord certificando actividad FS22 manualmente  
 2. **Corto plazo** — Servidor de juego dedicado para la comunidad VCT  
@@ -465,7 +548,7 @@ El Auditor Bancario es una aplicación **Python** que usa la API de **Discord** 
 
 ---
 
-## 19. Público objetivo de este documento
+## 20. Público objetivo de este documento
 
 Este informe está pensado para:
 

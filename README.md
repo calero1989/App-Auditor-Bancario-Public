@@ -25,6 +25,7 @@ Material **público** del proyecto **Vanilla Center Trust [VCT]**: bot de econom
 | [**informes/Informe_completo_VCT.pdf**](informes/Informe_completo_VCT.pdf) | **Informe completo en PDF** (economía, comandos, FS22 — sin datos técnicos sensibles) |
 | [informes/Informe_completo_VCT.md](informes/Informe_completo_VCT.md) | Mismo informe en Markdown |
 | [informes/anuncios/](informes/anuncios/) | Anuncios de actualización (2.2 … **2.9.4**) |
+| [ejemplos/](ejemplos/) | **Fragmentos de código depurados** (economía, FS22, guards, locks) |
 
 ### Enlace directo para compartir el PDF
 
