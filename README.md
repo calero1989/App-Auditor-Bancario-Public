@@ -24,7 +24,10 @@ Material **público** del proyecto **Vanilla Center Trust [VCT]**: bot de econom
 | [informes/LISTA_COMANDOS_AUDITOR_VCT.md](informes/LISTA_COMANDOS_AUDITOR_VCT.md) | Lista de comandos slash (~89) |
 | [**informes/Informe_completo_VCT.pdf**](informes/Informe_completo_VCT.pdf) | **Informe completo en PDF** (economía, comandos, FS22 — sin datos técnicos sensibles) |
 | [informes/Informe_completo_VCT.md](informes/Informe_completo_VCT.md) | Mismo informe en Markdown |
-| [informes/anuncios/](informes/anuncios/) | Anuncios de actualización (2.2 … **2.9.4**) |
+| [informes/INFORME_PUBLICO_CODIGO_VCT.md](informes/INFORME_PUBLICO_CODIGO_VCT.md) · [PDF](informes/INFORME_PUBLICO_CODIGO_VCT.pdf) | Código fuente explicado (público) |
+| [informes/INFORME_PUBLICO_CORRECCIONES_VCT.md](informes/INFORME_PUBLICO_CORRECCIONES_VCT.md) · [PDF](informes/INFORME_PUBLICO_CORRECCIONES_VCT.pdf) | Parches y corrección de errores |
+| [informes/INFORME_PUBLICO_PLANTILLAS_COMERCIO_VCT.md](informes/INFORME_PUBLICO_PLANTILLAS_COMERCIO_VCT.md) · [PDF](informes/INFORME_PUBLICO_PLANTILLAS_COMERCIO_VCT.pdf) | **Catálogo** del pack de plantillas (código completo = beneficio de pago) |
+| [informes/anuncios/](informes/anuncios/) | Anuncios de actualización (2.2 … **2.9.7**) |
 | [ejemplos/](ejemplos/) | **Fragmentos de código depurados** (economía, FS22, guards, locks) |
 
 ### Enlace directo para compartir el PDF
@@ -37,7 +40,7 @@ https://github.com/calero1989/App-Auditor-Bancario-Public/raw/main/informes/Info
 
 ## Apoyar el proyecto
 
-- **Patreon** — informe técnico ampliado para suscriptores y desarrollo del servidor dedicado  
+- **Patreon** — [patreon.com/calero89](https://www.patreon.com/calero89) (informe técnico + pack plantillas)  
 - **Ko-fi** — [ko-fi.com/calero89](https://ko-fi.com/calero89) (suscripción / Socio Preferente en Discord)
 
 ## Configuración (solo referencia)
