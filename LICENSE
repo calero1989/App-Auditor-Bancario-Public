@@ -1,0 +1,98 @@
+LICENCIA DE DOCUMENTACIÓN PÚBLICA
+App-Auditor-Bancario-Public · Vanilla Center Trust [VCT]
+
+Copyright (c) 2026 Angel del Valle Calero (calero89 / calero1989)
+Vanilla Center Trust [VCT]
+Todos los derechos reservados.
+
+================================================================================
+1. ALCANCE DE ESTE REPOSITORIO
+================================================================================
+
+Este repositorio público contiene ÚNICAMENTE documentación divulgada de la
+comunidad Vanilla Center Trust [VCT]: informes descriptivos, anuncios de
+actualización, listados de comandos, fragmentos de ejemplo didácticos y
+plantillas de configuración de referencia (p. ej. kofi.env.example).
+
+NO incluye el código fuente completo del bot «Auditor Bancario VCT», que
+permanece en el repositorio privado App-Auditor-Bancario bajo licencia
+propietaria separada.
+
+La presencia de archivos de ejemplo (carpeta ejemplos/) no autoriza la
+reconstrucción, copia o explotación comercial del software completo.
+
+================================================================================
+2. USO PERMITIDO DE LA DOCUMENTACIÓN
+================================================================================
+
+Se permite, sin autorización previa:
+
+  (a) Leer y consultar los informes para conocer el proyecto VCT.
+  (b) Enlazar (link) a este repositorio o a archivos concretos desde Discord,
+      Patreon, redes sociales o webs de la comunidad VCT.
+  (c) Citar fragmentos breves con atribución clara al titular y enlace a la
+      fuente original.
+  (d) Usar kofi.env.example como plantilla vacía en instalaciones propias
+      autorizadas por el titular.
+
+================================================================================
+3. USO PROHIBIDO
+================================================================================
+
+Queda prohibido sin permiso escrito del titular:
+
+  • Republicar informes completos en otros repositorios, foros o sitios de
+    descarga con fines comerciales o de competencia.
+  • Vender, sublicenciar o incluir esta documentación en productos de pago
+    ajenos a VCT sin acuerdo expreso.
+  • Presentar los informes o ejemplos como obra propia o eliminar avisos de
+    copyright y marca VCT.
+  • Afirmar que este repositorio concede derechos sobre el código del bot,
+    la economía del servidor, las marcas o los datos de jugadores.
+  • Extraer fragmentos de ejemplo para crear bots derivados o clones del
+    Auditor Bancario VCT sin licencia comercial.
+
+================================================================================
+4. FRAGMENTOS DE CÓDIGO DE EJEMPLO
+================================================================================
+
+Los archivos en ejemplos/ son extractos ilustrativos con fines educativos
+dentro del ecosistema VCT. Están protegidos por la misma titularidad que el
+proyecto principal. No constituyen software libre ni dominio público.
+
+Cualquier reutilización sustancial requiere autorización del titular.
+
+================================================================================
+5. MARCAS
+================================================================================
+
+«Vanilla Center Trust», «VCT», «Auditor Bancario VCT» y elementos gráficos
+asociados son marcas del titular. No se concede licencia de marca por el mero
+acceso a este repositorio.
+
+================================================================================
+6. EXCLUSIÓN DE GARANTÍA
+================================================================================
+
+La documentación se ofrece «tal cual», sin garantía de exactitud permanente
+respecto a versiones en producción del bot. Consulta el canal oficial de VCT
+para información actualizada.
+
+================================================================================
+7. CONTACTO Y CÓDIGO PRIVADO
+================================================================================
+
+Titular:  Angel del Valle Calero (calero89)
+Marca:    Vanilla Center Trust [VCT]
+Correo:   vidagaming.89@gmail.com
+Docs:     https://github.com/calero1989/App-Auditor-Bancario-Public
+Código:   repositorio privado (acceso solo con autorización del titular)
+
+================================================================================
+
+PUBLIC DOCUMENTATION LICENSE (summary — non-binding translation)
+
+Copyright (c) 2026 Angel del Valle Calero / Vanilla Center Trust [VCT].
+This public repo is documentation only; no rights to the full bot source code.
+Attribution required for quotes; no commercial republication without permission.
+Spanish text (sections 1–7) is authoritative.
