@@ -16,4 +16,4 @@ El código de producción permanece en el repositorio privado. Estos archivos si
 | [04_fs22_autocomplete.py](04_fs22_autocomplete.py) | Autocompletado de trabajos FS22 (límite 25 de Discord) |
 | [05_lock_transacciones_banco.py](05_lock_transacciones_banco.py) | Lock async para evitar carreras en mutaciones del banco |
 
-© Vanilla Center Trust [VCT] · Fragmentos de referencia pública
+© 2026 Angel del Valle Calero · Vanilla Center Trust [VCT] · Fragmentos de referencia pública

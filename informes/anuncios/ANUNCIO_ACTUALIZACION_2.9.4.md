@@ -1,7 +1,8 @@
 # Auditor Bancario VCT — Actualización 2.9.4
 
 **Título:** Parches de seguridad economía  
-**Versión:** 2.9.4 · **Jun 2026**
+**Versión:** 2.9.4 · **Jun 2026**  
+**Autor:** Angel del Valle Calero (calero89) · © 2026 · Vanilla Center Trust [VCT]
 
 ---
 
@@ -26,4 +27,4 @@ https://github.com/calero1989/App-Auditor-Bancario-Public
 
 ---
 
-© Vanilla Center Trust [VCT]
+© 2026 Angel del Valle Calero · Vanilla Center Trust [VCT]

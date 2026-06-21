@@ -2,6 +2,8 @@
 
 **Vanilla Center Trust [VCT]** · Mayo 2026
 
+**Autor:** Angel del Valle Calero (calero89) · © 2026
+
 ---
 
 ## ¿Qué es esta actualización?
@@ -146,9 +148,9 @@ Exentos: Fundador, admins Discord y dueño del servidor.
 
 Mantén el servidor vivo: un mensaje o un comando de vez en cuando evita sanciones.
 
-— Vanilla Center Trust [VCT]
+— Angel del Valle Calero · Vanilla Center Trust [VCT]
 ```
 
 ---
 
-*Auditor Bancario VCT — proyecto y marca Vanilla Center Trust [VCT].*
+*© 2026 Angel del Valle Calero · Auditor Bancario VCT — proyecto y marca Vanilla Center Trust [VCT].*

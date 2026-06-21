@@ -1,6 +1,7 @@
 # Auditor Bancario VCT — Informe público: código fuente explicado
 
 **Versión:** 2.9.7 · **Público** — apto para GitHub, Patreon y NotebookLM  
+**Autor:** Angel del Valle Calero (calero89) · © 2026 · Vanilla Center Trust [VCT]  
 **Sin datos de infraestructura, tokens ni IDs de servidor**
 
 ---
@@ -249,4 +250,4 @@ Carpeta [`ejemplos/`](ejemplos/):
 
 ---
 
-© Vanilla Center Trust [VCT] · Informe público de código · v2.9.7
+© 2026 Angel del Valle Calero · Vanilla Center Trust [VCT] · Informe público de código · v2.9.7

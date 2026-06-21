@@ -1,6 +1,7 @@
 # Auditor Bancario VCT — Informe público: corrección de errores y parches
 
 **Versión actual:** 2.9.7  
+**Autor:** Angel del Valle Calero (calero89) · © 2026 · Vanilla Center Trust [VCT]  
 **Público** — transparencia sobre bugs corregidos y mejoras de seguridad económica
 
 ---
@@ -154,4 +155,4 @@ El Auditor maneja **dinero virtual con valor de rol**. Un bug que duplique saldo
 
 ---
 
-© Vanilla Center Trust [VCT] · Informe público de correcciones · v2.9.7
+© 2026 Angel del Valle Calero · Vanilla Center Trust [VCT] · Informe público de correcciones · v2.9.7

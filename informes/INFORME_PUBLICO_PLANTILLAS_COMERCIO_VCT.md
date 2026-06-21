@@ -1,6 +1,7 @@
 # Auditor Bancario VCT — Pack de plantillas comerciales
 
 **Versión de referencia:** 2.9.7  
+**Autor:** Angel del Valle Calero (calero89) · © 2026 · Vanilla Center Trust [VCT]  
 **Documento público** — escaparate y catálogo (sin código operativo)
 
 ---
@@ -137,5 +138,5 @@ Recomendado para 24/7. Las plantillas incluyen referencias a despliegue systemd 
 
 ---
 
-© Vanilla Center Trust [VCT] · Catálogo público de plantillas · v2.9.7  
+© 2026 Angel del Valle Calero · Vanilla Center Trust [VCT] · Catálogo público de plantillas · v2.9.7  
 *Proyecto de fan / comunidad. No afiliado a GIANTS Software ni Discord Inc.*

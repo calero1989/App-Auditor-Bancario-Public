@@ -2,6 +2,8 @@
 
 **Vanilla Center Trust [VCT]** · Mayo 2026
 
+**Autor:** Angel del Valle Calero (calero89) · © 2026
+
 ---
 
 ## ¿Qué es esta actualización?
@@ -127,4 +129,4 @@ Sí. Son cosas distintas: nómina por **rol Discord**; trabajos FS22 por **decla
 
 ---
 
-*Auditor Bancario VCT — proyecto y marca Vanilla Center Trust [VCT].*
+*© 2026 Angel del Valle Calero · Auditor Bancario VCT — proyecto y marca Vanilla Center Trust [VCT].*

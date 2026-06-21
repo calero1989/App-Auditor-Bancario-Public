@@ -1,7 +1,7 @@
 # Auditor Bancario VCT — Resumen público (versión gratuita)
 
 **Documento:** v1.0-gratis · **Proyecto:** Vanilla Center Trust [VCT]  
-**Autor:** Ángel (calero89) · © 2026 · **Estado:** desarrollo constante
+**Autor:** Angel del Valle Calero (calero89) · © 2026 · **Estado:** desarrollo constante
 
 ---
 
@@ -56,6 +56,6 @@ Mantener hosting, desarrollo y la integración juego↔Discord requiere tiempo y
 
 **Gracias por formar parte de Vanilla Center Trust.**
 
-— Ángel (calero89) · Auditor Bancario VCT
+— Angel del Valle Calero (calero89) · Auditor Bancario VCT
 
 *Versión gratuita v1.0 — sin datos técnicos ni secretos. Informe ampliado reservado a mecenas.*

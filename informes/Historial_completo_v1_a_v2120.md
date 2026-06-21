@@ -2,6 +2,8 @@
 
 **Vanilla Center Trust [VCT]** · Farming Simulator 22 · Discord
 
+**Autor:** Angel del Valle Calero (calero89) · © 2026
+
 Historial de actualizaciones desde el **banco VCT inicial (2026.1 / v1.0)** hasta **2.12.0**.
 
 Resumen del ecosistema: economía legal e ilegal, FS22, inactividad, prisión, tiendas, sociedad P2P, monetización Socio VCT y **progresión por niveles XP**.
@@ -333,3 +335,5 @@ Resumen del ecosistema: economía legal e ilegal, FS22, inactividad, prisión, t
 - **Comando en Discord:** `/version` · `/nivel_vct`
 
 *Informe público sin credenciales ni datos personales de jugadores.*
+
+*© 2026 Angel del Valle Calero · Vanilla Center Trust [VCT]*

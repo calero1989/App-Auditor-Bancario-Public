@@ -1,6 +1,7 @@
 # 📋 Comandos del Auditor Bancario VCT
 
-**Versión:** 2.9.3 · **Vanilla Center Trust [VCT]** · **88 comandos**
+**Versión:** 2.9.3 · **Vanilla Center Trust [VCT]** · **88 comandos**  
+**Autor:** Angel del Valle Calero (calero89) · © 2026
 
 > En Discord escribe `/` y el nombre del comando.  
 > Lo que ocurre en FS22/Luna **solo cuenta** si lo declaras aquí (salvo registro directo por staff).  
@@ -231,5 +232,5 @@ Staff: /pendientes_fs22 · /aceptar_trabajo_fs22 · /rechazar_trabajo_fs22
 /version · /novedades
 
 En FS22 solo cuenta lo certificado en Discord.
-— Vanilla Center Trust [VCT]
+— Angel del Valle Calero · Vanilla Center Trust [VCT]
 ```

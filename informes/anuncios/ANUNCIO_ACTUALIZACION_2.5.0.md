@@ -2,6 +2,8 @@
 
 **Vanilla Center Trust [VCT]** · Junio 2026
 
+**Autor:** Angel del Valle Calero (calero89) · © 2026
+
 ---
 
 ## ¿Qué es esta actualización?
@@ -189,7 +191,7 @@ Pega el bloque siguiente en la descripción del formulario de `/anuncio`:
 
 Versión: /version · /novedades
 
-— Vanilla Center Trust [VCT]
+— Angel del Valle Calero · Vanilla Center Trust [VCT]
 ```
 
 ---
@@ -208,4 +210,4 @@ Documento ampliado tienda legal: `ANUNCIO_ACTUALIZACION_2.4.0.md`
 
 ---
 
-*Auditor Bancario VCT — proyecto y marca Vanilla Center Trust [VCT].*
+*© 2026 Angel del Valle Calero · Auditor Bancario VCT — proyecto y marca Vanilla Center Trust [VCT].*
