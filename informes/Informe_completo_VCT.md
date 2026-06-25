@@ -135,8 +135,9 @@ Consulta: **`/nivel_vct`**. Comandos bloqueados muestran mensaje con nivel reque
 
 | Nivel C | Comandos |
 |---------|----------|
+| C0 | `/mini_trabajos_ocultos` |
 | C5 | `/tienda_especial_vct`, `/inventario_vct` |
-| C8 | `/alijo_vct`, `/ocultar_nrd`, `/mini_trabajos_ocultos` |
+| C8 | `/alijo_vct`, `/ocultar_nrd`, `/recuperar_nrd` |
 | C10 | `/robar`, `/blanquear_fondos` |
 | C12 | `/desafio_criminal`, `/transferir_nrd` |
 | C15 | `/extorsionar`, `/contrabando_fs22` |
