@@ -9,7 +9,7 @@
 
 Bot de Discord que gestiona la **economía, reputación y trámites** de VCT: dinero legal, caja fuerte, dinero negro, nóminas por rangos, trabajos FS22, juegos, mercado negro, tiendas interactivas, alarma/persecución/arresto y automatizaciones 24/7.
 
-**Última versión pública documentada:** **2.9.4** (parches de seguridad economía — Jun 2026).
+**Última versión pública documentada:** **2.12.11** (fix inactividad y contrabando — Jun 2026).
 
 ---
 

@@ -4,11 +4,63 @@
 
 **Autor:** Angel del Valle Calero (calero89) · © 2026
 
-Historial de actualizaciones desde el **banco VCT inicial (2026.1 / v1.0)** hasta **2.12.0**.
+Historial de actualizaciones desde el **banco VCT inicial (2026.1 / v1.0)** hasta **2.12.11**.
 
 Resumen del ecosistema: economía legal e ilegal, FS22, inactividad, prisión, tiendas, sociedad P2P, monetización Socio VCT y **progresión por niveles XP**.
 
 ---
+
+## v2.12.11 — Fix persistencia actividad inactividad (Jun 2026)
+
+- Mensajes en el servidor y comandos del bot **guardan siempre** `ultima_actividad` al disco (antes solo a veces, p. ej. al dar XP del día)
+- El autocompletado ya no dispara guardados innecesarios
+- El backup horario vuelca la RAM al disco antes de copiar el JSON del banco
+- Corrige expulsiones injustas cuando el usuario había escrito en chat pero el plazo no se había persistido
+
+## v2.12.10 — Fix contrabando por sector (Jun 2026)
+
+- Autocompletado de producto en `/contrabando_fs22` filtra correctamente por sector elegido
+- Sin sector → aviso para elegirlo primero (no mezcla los 16 productos)
+
+## v2.12.9 — Comandos consolidados y atraco (Jun 2026)
+
+- Desplegable de víctima en `/atraco_planificado` lista usuarios del banco con patrimonio
+- Grupos `/casino_vct` y `/fondo_sector` (ver, aportar, gastar); `/perfil_fs22` incluye historial
+- Eliminados `/denunciar`, `/trabajos_fs22`, `/historial_fs22` y `/anuncio_directo`
+
+## v2.12.8 — Fix /que_paso (Jun 2026)
+
+- Ya no falla cuando el resumen de trabajos supera el límite de caracteres del embed
+
+## v2.12.7 — XP criminal y estabilidad (Jun 2026)
+
+- `/mini_trabajos_ocultos` desde C0 · contrabando/blanqueo/contrato P2P otorgan XP
+- Multa inspección contrabando sin saldo negativo · tope diario XP respetado
+- Lock compartido en eventos y guante blanco horario
+
+## v2.12.6 — Autocomplete contrabando (Jun 2026)
+
+- Sin error al cargar opciones por guards de nivel/arresto
+
+## v2.12.5 — Admin bajo arresto (Jun 2026)
+
+- Fundador y admins pueden usar comandos staff arrestados
+
+## v2.12.4 — Estabilidad guards y atracos (Jun 2026)
+
+- Guards unificados · fix `/atraco_responder` y `/contrato_responder`
+
+## v2.12.3 — Correcciones internas (Jun 2026)
+
+- Restaurado import en sociedad · guards en un solo `interaction_check`
+
+## v2.12.2 — Avisos al recibir dinero (Jun 2026)
+
+- DM automático al receptor en transferencias, pagos, NRD, préstamos, extorsiones y desafíos
+
+## v2.12.1 — Contrato P2P unificado (Jun 2026)
+
+- Eliminado `/contrato_entre_ciudadanos` — usa `/contrato_entre_jugadores`
 
 ## v2.12.0 — Sistema de niveles y XP (Jun 2026)
 

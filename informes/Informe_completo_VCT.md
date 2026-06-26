@@ -3,7 +3,7 @@
 **Proyecto:** Vanilla Center Trust [VCT]  
 **Autor:** Angel del Valle Calero (calero89) · © 2026  
 **Producto:** Auditor Bancario VCT (bot de economía y trámites en Discord)  
-**Versión de referencia:** 2.12.0 (junio 2026)  
+**Versión de referencia:** 2.12.11 (junio 2026)  
 **Contexto:** Comunidad de rol vinculada a Farming Simulator 22  
 **Idioma:** Español  
 
@@ -12,7 +12,7 @@
 
 **Fuentes complementarias (URLs):**
 - Post Patreon 2.12.0: https://www.patreon.com/calero89/posts/auditor-bancario-161084864  
-- Historial completo MD: https://github.com/calero1989/App-Auditor-Bancario-Public/blob/main/informes/Historial_completo_v1_a_v2120.md  
+- Historial completo MD: https://github.com/calero1989/App-Auditor-Bancario-Public/blob/main/informes/Historial_completo_v1_a_v2120.md (actualizado hasta v2.12.11)  
 - Repo docs público: https://github.com/calero1989/App-Auditor-Bancario-Public  
 
 ---
@@ -162,9 +162,11 @@ Comandos: `/postular_encargado`, `/estado_postulacion_vct`, `/admin_nivel` (admi
 
 ---
 
-## 4. Inactividad (v2.10–2.11)
+## 4. Inactividad (v2.10–2.11, fix v2.12.11)
 
 **Actividad válida:** mensajes en Discord **o** comandos del Auditor. Reinicia el plazo.
+
+Desde **v2.12.11**, cada mensaje y comando **guarda siempre** la fecha de última actividad en el banco (antes podía quedar solo en memoria y provocar sanciones injustas).
 
 **Consulta:** `/actividad_vct` · Aviso **DM ~24 h** antes de cada fase.
 
@@ -334,7 +336,7 @@ Fundador / admin Discord: saldos globales, dar/retirar fondos, incautar alijo, i
 
 ---
 
-## 14. Inventario de comandos (2.12.0)
+## 14. Inventario de comandos (2.12.11)
 
 ### Info y progresión
 `/version` · `/nivel_vct` · `/postular_encargado` · `/estado_postulacion_vct` · `/tienda_vct` · `/verificar_socio_vct` · `/mis_pendientes_vct`
@@ -359,6 +361,9 @@ Fundador / admin Discord: saldos globales, dar/retirar fondos, incautar alijo, i
 
 | Versión | Tema principal |
 |---------|----------------|
+| **2.12.11** | Fix persistencia actividad inactividad (chat/comandos siempre guardan) |
+| 2.12.10 | Contrabando FS22 filtrado por sector |
+| 2.12.9 | Comandos consolidados, fix víctima atraco |
 | **2.12.0** | Niveles XP N0–N30 / C5–C20, bloqueo comandos, roles auto, postulación Encargado |
 | 2.11.2 | Unificación `/version` y `/aceptar_trabajo_fs22` |
 | 2.11.1 | Inactividad granja solo sectores FS22 |
@@ -401,10 +406,10 @@ Historial detallado versión por versión: ver PDF/MD en Patreon y GitHub públi
 - ¿Cómo certificar un trabajo FS22?  
 - ¿Qué desbloquea el nivel N15 o C10?  
 - ¿Cómo funciona robo, persecución y fianza?  
-- ¿Qué cambió en la versión 2.12.0?  
+- ¿Qué cambió en la versión 2.12.11?
 
-**Combinar con:** PDF historial completo (Patreon) para changelog exhaustivo v1.0→2.12.0.
+**Combinar con:** PDF historial completo (Patreon) para changelog exhaustivo v1.0→2.12.11.
 
 ---
 
-© 2026 Angel del Valle Calero · Vanilla Center Trust [VCT] · Auditor Bancario 2.12.0 · Documento de conocimiento (sin datos de acceso)
+© 2026 Angel del Valle Calero · Vanilla Center Trust [VCT] · Auditor Bancario 2.12.11 · Documento de conocimiento (sin datos de acceso)

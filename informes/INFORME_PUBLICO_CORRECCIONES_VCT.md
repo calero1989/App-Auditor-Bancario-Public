@@ -1,6 +1,6 @@
 # Auditor Bancario VCT — Informe público: corrección de errores y parches
 
-**Versión actual:** 2.9.7  
+**Versión actual:** 2.12.11  
 **Autor:** Angel del Valle Calero (calero89) · © 2026 · Vanilla Center Trust [VCT]  
 **Público** — transparencia sobre bugs corregidos y mejoras de seguridad económica
 
@@ -76,7 +76,29 @@ El Auditor maneja **dinero virtual con valor de rol**. Un bug que duplique saldo
 
 ---
 
-## 3. Mejoras v2.9.2 – v2.9.3
+## 3. Parches críticos v2.12.10 – v2.12.11 (inactividad y contrabando)
+
+### 3.1 Actividad en chat no persistía (expulsiones injustas)
+
+| | |
+|---|---|
+| **Problema** | `on_message` actualizaba `ultima_actividad` en RAM pero `guardar_datos()` solo se llamaba si el mensaje otorgaba XP (tope diario 20 XP). Comandos vía `on_interaction` nunca guardaban. |
+| **Impacto** | Usuario escribía en chat horas antes del control de inactividad (10:00) pero el JSON seguía con fecha antigua → multa, despido, cuarentena y expulsión en cadena. |
+| **Agravante** | Sin `ultima_actividad` guardada, el bot infería desde `last_pay` por defecto (2000-01-01) → miles de días inactivo. |
+| **Corrección** | `bot_core.py`: siempre `guardar_datos()` tras mensaje; interacciones (sin autocomplete) también guardan. `automation.py`: flush RAM antes del backup horario. |
+| **Estado** | ✅ Corregido v2.12.11 |
+
+### 3.2 Contrabando mezclaba productos de todos los sectores
+
+| | |
+|---|---|
+| **Problema** | Autocompletado de `/contrabando_fs22` no recibía el sector de Discord → listaba los 16 productos. |
+| **Corrección** | Lectura sector desde namespace + payload; filtro estricto por sector; validación al ejecutar. |
+| **Estado** | ✅ Corregido v2.12.10 |
+
+---
+
+## 4. Mejoras v2.9.2 – v2.9.3
 
 | Versión | Corrección / mejora |
 |---------|---------------------|
@@ -87,7 +109,7 @@ El Auditor maneja **dinero virtual con valor de rol**. Un bug que duplique saldo
 
 ---
 
-## 4. Correcciones funcionales v2.6.x – v2.8.x
+## 5. Correcciones funcionales v2.6.x – v2.8.x
 
 | Versión | Tema |
 |---------|------|
@@ -98,17 +120,20 @@ El Auditor maneja **dinero virtual con valor de rol**. Un bug que duplique saldo
 
 ---
 
-## 5. Mejoras recientes v2.9.5 – v2.9.7
+## 6. Mejoras recientes v2.9.5 – v2.12.9
 
 | Versión | Cambio | Tipo |
 |---------|--------|------|
 | 2.9.5 | Tope caja fuerte atraco 100k + bonos líder/decodificador | Balance |
 | 2.9.6 | `/contrabando_fs22` rediseñado (NRD + rep, no solo declaración) | Feature fix |
 | 2.9.7 | Expediente penitenciario público en canal prisión | Feature |
+| 2.12.9 | Consolidación comandos, fix desplegable víctima atraco | Feature |
+| 2.12.10 | Contrabando filtrado por sector | Bugfix |
+| 2.12.11 | Persistencia actividad inactividad | Bugfix crítico |
 
 ---
 
-## 6. Cómo reportar un bug en VCT
+## 7. Cómo reportar un bug en VCT
 
 1. Describir comando exacto y parámetros.
 2. Captura del mensaje del bot (ephemeral o canal).
@@ -117,7 +142,7 @@ El Auditor maneja **dinero virtual con valor de rol**. Un bug que duplique saldo
 
 ---
 
-## 7. Proceso de despliegue de un parche
+## 8. Proceso de despliegue de un parche
 
 ```
 1. Corregir en PC local (vct_auditor/)
@@ -131,17 +156,17 @@ El Auditor maneja **dinero virtual con valor de rol**. Un bug que duplique saldo
 
 ---
 
-## 8. Errores conocidos / limitaciones actuales
+## 9. Errores conocidos / limitaciones actuales
 
 | Tema | Estado |
 |------|--------|
-| Saldo negativo en multas si no hay fondos | Sin piso en 0 en algunos comandos |
+| Saldo negativo en multas si no hay fondos | Mitigado en contrabando v2.12.7; revisar otros comandos |
 | Patreon API no crea posts automáticamente | Publicación manual |
 | Activity Discord no integrada | No aplica al bot actual |
 
 ---
 
-## 9. Tabla resumen parches de seguridad
+## 10. Tabla resumen parches de seguridad
 
 | ID | Severidad | Versión | Área |
 |----|-----------|---------|------|
@@ -153,6 +178,9 @@ El Auditor maneja **dinero virtual con valor de rol**. Un bug que duplique saldo
 | SEC-06 | Media | 2.9.4 | Persecución doble |
 | SEC-07 | Media | 2.9.2 | Arresto 1/día |
 
+| SEC-08 | Crítica | 2.12.11 | Actividad inactividad no persistida |
+| SEC-09 | Media | 2.12.10 | Contrabando sector autocomplete |
+
 ---
 
-© 2026 Angel del Valle Calero · Vanilla Center Trust [VCT] · Informe público de correcciones · v2.9.7
+© 2026 Angel del Valle Calero · Vanilla Center Trust [VCT] · Informe público de correcciones · v2.12.11
