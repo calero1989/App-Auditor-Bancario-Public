@@ -87,9 +87,11 @@ Cada cuenta de jugador es un objeto en `banco_vct.json` indexado por ID Discord.
 @asynccontextmanager
 async def transaccion_banco(*, persistir: bool = True):
     async with bot._banco_lock:
-        yield bot
-        if persistir:
-            guardar_json_atomico(ruta_banco(), bot.banco)
+        try:
+            yield bot
+        finally:
+            if persistir:
+                guardar_json_atomico(ruta_banco(), bot.banco)
 ```
 
 Todos los slash commands se envuelven al registrarse:

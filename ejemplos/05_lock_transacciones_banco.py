@@ -28,9 +28,11 @@ def guardar_banco(cuentas: dict) -> None:
 @asynccontextmanager
 async def transaccion_banco(*, persistir: bool = True):
     async with estado._lock:
-        yield estado
-        if persistir:
-            guardar_banco(estado.cuentas)
+        try:
+            yield estado
+        finally:
+            if persistir:
+                guardar_banco(estado.cuentas)
 
 
 def envolver_arbol_comandos(tree: app_commands.CommandTree) -> None:
