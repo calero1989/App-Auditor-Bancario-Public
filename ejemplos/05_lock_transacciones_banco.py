@@ -7,6 +7,7 @@ from __future__ import annotations
 import asyncio
 import functools
 from contextlib import asynccontextmanager
+from contextvars import ContextVar
 
 from discord import app_commands
 
@@ -18,6 +19,10 @@ class EstadoBanco:
 
 
 estado = EstadoBanco()
+_profundidad_transaccion_banco: ContextVar[int] = ContextVar(
+    "profundidad_transaccion_banco",
+    default=0,
+)
 
 
 def guardar_banco(cuentas: dict) -> None:
@@ -27,10 +32,23 @@ def guardar_banco(cuentas: dict) -> None:
 
 @asynccontextmanager
 async def transaccion_banco(*, persistir: bool = True):
+    profundidad = _profundidad_transaccion_banco.get()
+    if profundidad:
+        token = _profundidad_transaccion_banco.set(profundidad + 1)
+        try:
+            yield estado
+        finally:
+            _profundidad_transaccion_banco.reset(token)
+        return
+
     async with estado._lock:
-        yield estado
-        if persistir:
-            guardar_banco(estado.cuentas)
+        token = _profundidad_transaccion_banco.set(1)
+        try:
+            yield estado
+            if persistir:
+                guardar_banco(estado.cuentas)
+        finally:
+            _profundidad_transaccion_banco.reset(token)
 
 
 def envolver_arbol_comandos(tree: app_commands.CommandTree) -> None:
