@@ -113,6 +113,9 @@ async def depositar(interaction: discord.Interaction, monto: int):
     bot = get_bot()
     bot.check_user(interaction.user.id)      # Crea cuenta si no existe
     datos = bot.banco[str(interaction.user.id)]
+    if monto <= 0:
+        await interaction.response.send_message("❌ El monto debe ser positivo.", ephemeral=True)
+        return
     if datos["balance"] < monto:
         await interaction.response.send_message("❌ Saldo insuficiente.", ephemeral=True)
         return
