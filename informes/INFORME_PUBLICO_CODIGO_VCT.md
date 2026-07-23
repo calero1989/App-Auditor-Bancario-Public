@@ -68,9 +68,13 @@ TRABAJOS_FS22 = {
 ## 4. Persistencia segura (`storage.py`)
 
 ```python
+import json
+import os
+import time
+
 def guardar_json_atomico(ruta: str, datos):
-    temporal = f"{ruta}.{pid}.{time_ns}.tmp"
-    with open(temporal, "w") as f:
+    temporal = f"{ruta}.{os.getpid()}.{time.time_ns()}.tmp"
+    with open(temporal, "w", encoding="utf-8") as f:
         json.dump(datos, f, indent=4)
         f.flush()
         os.fsync(f.fileno())
