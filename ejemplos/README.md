@@ -15,5 +15,6 @@ El código de producción permanece en el repositorio privado. Estos archivos si
 | [03_guard_arresto_tiendas.py](03_guard_arresto_tiendas.py) | Bloqueo de botones/menús si el jugador está arrestado |
 | [04_fs22_autocomplete.py](04_fs22_autocomplete.py) | Autocompletado de trabajos FS22 (límite 25 de Discord) |
 | [05_lock_transacciones_banco.py](05_lock_transacciones_banco.py) | Lock async para evitar carreras en mutaciones del banco |
+| [06_persistencia_json_atomica.py](06_persistencia_json_atomica.py) | Escritura JSON atómica (tmp + fsync + finally) |
 
 © 2026 Angel del Valle Calero · Vanilla Center Trust [VCT] · Fragmentos de referencia pública

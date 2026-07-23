@@ -67,14 +67,29 @@ TRABAJOS_FS22 = {
 
 ## 4. Persistencia segura (`storage.py`)
 
+Versión **didáctica** (autocontenida). En producción se añaden carpeta destino, backup `.ultimo_ok` y reintentos ante `PermissionError`. El mismo fragmento vive en [`ejemplos/06_persistencia_json_atomica.py`](ejemplos/06_persistencia_json_atomica.py).
+
 ```python
-def guardar_json_atomico(ruta: str, datos):
-    temporal = f"{ruta}.{pid}.{time_ns}.tmp"
-    with open(temporal, "w") as f:
-        json.dump(datos, f, indent=4)
-        f.flush()
-        os.fsync(f.fileno())
-    os.replace(temporal, ruta)  # Atómico en POSIX/Windows
+import json
+import os
+import time
+
+
+def guardar_json_atomico(ruta: str, datos) -> None:
+    """Escribe `datos` en `ruta` vía fichero temporal + replace + fsync."""
+    temporal = f"{ruta}.{os.getpid()}.{time.time_ns()}.tmp"
+    try:
+        with open(temporal, "w", encoding="utf-8") as f:
+            json.dump(datos, f, indent=4, ensure_ascii=False)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(temporal, ruta)  # Atómico en POSIX/Windows
+    finally:
+        if os.path.exists(temporal):
+            try:
+                os.remove(temporal)
+            except OSError:
+                pass
 ```
 
 Cada cuenta de jugador es un objeto en `banco_vct.json` indexado por ID Discord.
@@ -83,13 +98,16 @@ Cada cuenta de jugador es un objeto en `banco_vct.json` indexado por ID Discord.
 
 ## 5. Lock anti double-spend (`banco_sync.py`)
 
+El `fsync` del JSON no debe bloquear el event loop ni otros slash (límite Discord 3 s). Tras mutar en memoria se hace snapshot y se persiste en un hilo:
+
 ```python
 @asynccontextmanager
 async def transaccion_banco(*, persistir: bool = True):
     async with bot._banco_lock:
         yield bot
-        if persistir:
-            guardar_json_atomico(ruta_banco(), bot.banco)
+        snapshot = copy.deepcopy(bot.banco) if persistir else None
+    if snapshot is not None:
+        await asyncio.to_thread(guardar_json_atomico, ruta_banco(), snapshot)
 ```
 
 Todos los slash commands se envuelven al registrarse:
@@ -238,6 +256,7 @@ Carpeta [`ejemplos/`](ejemplos/):
 | `03_guard_arresto_tiendas.py` | Bloqueo reclusos |
 | `04_fs22_autocomplete.py` | Autocompletado |
 | `05_lock_transacciones_banco.py` | Lock async |
+| `06_persistencia_json_atomica.py` | JSON atómico (tmp + fsync) |
 
 ---
 

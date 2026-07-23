@@ -1,10 +1,11 @@
 """
-Serialización de mutaciones del banco en memoria (v2.9.4).
-Evita condiciones de carrera cuando varios comandos tocan saldos a la vez.
+Serialización de mutaciones del banco en memoria.
+Evita condiciones de carrera; el fsync corre fuera del lock (hilo).
 """
 from __future__ import annotations
 
 import asyncio
+import copy
 import functools
 from contextlib import asynccontextmanager
 
@@ -21,7 +22,7 @@ estado = EstadoBanco()
 
 
 def guardar_banco(cuentas: dict) -> None:
-    """En producción: escritura atómica a JSON (ver storage.guardar_json_atomico)."""
+    """En producción: escritura atómica a JSON (ver 06_persistencia_json_atomica)."""
     pass
 
 
@@ -29,8 +30,9 @@ def guardar_banco(cuentas: dict) -> None:
 async def transaccion_banco(*, persistir: bool = True):
     async with estado._lock:
         yield estado
-        if persistir:
-            guardar_banco(estado.cuentas)
+        snapshot = copy.deepcopy(estado.cuentas) if persistir else None
+    if snapshot is not None:
+        await asyncio.to_thread(guardar_banco, snapshot)
 
 
 def envolver_arbol_comandos(tree: app_commands.CommandTree) -> None:
