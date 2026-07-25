@@ -98,7 +98,7 @@ Cada cuenta de jugador es un objeto en `banco_vct.json` indexado por ID Discord.
 
 ## 5. Lock anti double-spend (`banco_sync.py`)
 
-El `fsync` del JSON no debe bloquear el event loop ni otros slash (límite Discord 3 s). Tras mutar en memoria se hace snapshot y se persiste en un hilo:
+El `fsync` del JSON no debe bloquear el event loop ni otros slash (límite Discord 3 s). Tras mutar en memoria se hace snapshot y se persiste en un hilo; los guardados se serializan para que una foto antigua no pueda sobrescribir una más reciente:
 
 ```python
 @asynccontextmanager
@@ -107,7 +107,8 @@ async def transaccion_banco(*, persistir: bool = True):
         yield bot
         snapshot = copy.deepcopy(bot.banco) if persistir else None
     if snapshot is not None:
-        await asyncio.to_thread(guardar_json_atomico, ruta_banco(), snapshot)
+        async with bot._banco_persist_lock:
+            await asyncio.to_thread(guardar_json_atomico, ruta_banco(), snapshot)
 ```
 
 Todos los slash commands se envuelven al registrarse:

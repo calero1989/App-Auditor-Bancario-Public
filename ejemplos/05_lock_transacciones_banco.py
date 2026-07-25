@@ -1,6 +1,6 @@
 """
 Serialización de mutaciones del banco en memoria.
-Evita condiciones de carrera; el fsync corre fuera del lock (hilo).
+Evita condiciones de carrera; el fsync corre fuera del lock principal (hilo).
 """
 from __future__ import annotations
 
@@ -16,6 +16,7 @@ class EstadoBanco:
     def __init__(self) -> None:
         self.cuentas: dict = {}
         self._lock = asyncio.Lock()
+        self._persist_lock = asyncio.Lock()
 
 
 estado = EstadoBanco()
@@ -32,7 +33,8 @@ async def transaccion_banco(*, persistir: bool = True):
         yield estado
         snapshot = copy.deepcopy(estado.cuentas) if persistir else None
     if snapshot is not None:
-        await asyncio.to_thread(guardar_banco, snapshot)
+        async with estado._persist_lock:
+            await asyncio.to_thread(guardar_banco, snapshot)
 
 
 def envolver_arbol_comandos(tree: app_commands.CommandTree) -> None:
