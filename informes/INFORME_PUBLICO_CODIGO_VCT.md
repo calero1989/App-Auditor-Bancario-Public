@@ -166,7 +166,8 @@ async def registrar_contrato_fs22(interaction, tipo: str):
 
 ```python
 async def bloquear_si_arrestado(interaction, banco) -> bool:
-    if not esta_arrestado(banco[str(interaction.user.id)]):
+    uid = str(interaction.user.id)
+    if uid not in banco or not esta_arrestado(banco[uid]):
         return False
     await interaction.response.send_message(MENSAJE_BLOQUEO_ARRESTO, ephemeral=True)
     return True
@@ -216,12 +217,13 @@ else:
 
 ```python
 class TiendaLegalView(ui.View):
-    def __init__(self):
+    def __init__(self, banco):
         super().__init__(timeout=None)  # Persistente
+        self.banco = banco
 
     @ui.button(label="Comprar", custom_id="vct_tienda_legal_comprar")
     async def comprar(self, interaction, button):
-        if await bloquear_si_arrestado(interaction):
+        if await bloquear_si_arrestado(interaction, self.banco):
             return
         # lógica compra...
 ```
