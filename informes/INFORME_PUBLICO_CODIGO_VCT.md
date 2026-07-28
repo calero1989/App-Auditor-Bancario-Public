@@ -101,6 +101,11 @@ Cada cuenta de jugador es un objeto en `banco_vct.json` indexado por ID Discord.
 El `fsync` del JSON no debe bloquear el event loop ni otros slash (límite Discord 3 s). Tras mutar en memoria se hace snapshot y se persiste en un hilo:
 
 ```python
+import asyncio
+import copy
+from contextlib import asynccontextmanager
+
+
 @asynccontextmanager
 async def transaccion_banco(*, persistir: bool = True):
     async with bot._banco_lock:
