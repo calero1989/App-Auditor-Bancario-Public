@@ -238,6 +238,8 @@ class TiendaLegalView(ui.View):
 | Discord SKU | `monetization.py` | Rol Socio VCT + `/verificar_socio_vct` |
 
 ```python
+SKU_SOCIO_VCT = int(_cargar_variable_env("DISCORD_SKU_SOCIO_VCT_ID", "0") or "0")
+
 async for ent in bot.entitlements(exclude_ended=True):
     if ent.sku_id == SKU_SOCIO_VCT:
         await otorgar_rol_socio_vct(miembro)
