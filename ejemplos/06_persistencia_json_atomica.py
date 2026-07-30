@@ -13,8 +13,20 @@ import os
 import time
 
 
+def _fsync_directorio(ruta: str) -> None:
+    directorio = os.path.dirname(os.path.abspath(ruta)) or "."
+    try:
+        fd = os.open(directorio, os.O_RDONLY)
+    except OSError:
+        return
+    try:
+        os.fsync(fd)
+    finally:
+        os.close(fd)
+
+
 def guardar_json_atomico(ruta: str, datos) -> None:
-    """Escribe `datos` en `ruta` vía fichero temporal + replace + fsync."""
+    """Escribe `datos` en `ruta` vía temporal + replace + fsync."""
     temporal = f"{ruta}.{os.getpid()}.{time.time_ns()}.tmp"
     try:
         with open(temporal, "w", encoding="utf-8") as f:
@@ -22,6 +34,7 @@ def guardar_json_atomico(ruta: str, datos) -> None:
             f.flush()
             os.fsync(f.fileno())
         os.replace(temporal, ruta)  # Atómico en POSIX/Windows
+        _fsync_directorio(ruta)
     finally:
         if os.path.exists(temporal):
             try:
