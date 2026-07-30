@@ -1,3 +1,23 @@
 .DS_Store
 Thumbs.db
 *.log
+
+# Secretos y entorno local
+.env
+.env.*
+!.env.example
+kofi.env
+*.pem
+*.key
+credentials*
+secrets/
+*.secret
+
+# Backups y datos locales del bot
+*.ultimo_ok
+banco_vct.json
+*.tmp
+__pycache__/
+.pytest_cache/
+.venv/
+venv/

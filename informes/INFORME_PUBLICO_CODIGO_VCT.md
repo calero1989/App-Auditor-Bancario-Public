@@ -98,16 +98,26 @@ Cada cuenta de jugador es un objeto en `banco_vct.json` indexado por ID Discord.
 
 ## 5. Lock anti double-spend (`banco_sync.py`)
 
-El `fsync` del JSON no debe bloquear el event loop ni otros slash (límite Discord 3 s). Tras mutar en memoria se hace snapshot y se persiste en un hilo:
+El `fsync` del JSON no debe bloquear el event loop ni otros slash (límite Discord 3 s). Tras mutar en memoria se hace snapshot (también si el comando falla) y se persiste en un hilo; los guardados se serializan para que una foto antigua no sobrescriba una más reciente:
 
 ```python
+import asyncio
+import copy
+from contextlib import asynccontextmanager
+
+
 @asynccontextmanager
 async def transaccion_banco(*, persistir: bool = True):
     async with bot._banco_lock:
-        yield bot
-        snapshot = copy.deepcopy(bot.banco) if persistir else None
+        snapshot = None
+        try:
+            yield bot
+        finally:
+            if persistir:
+                snapshot = copy.deepcopy(bot.banco)
     if snapshot is not None:
-        await asyncio.to_thread(guardar_json_atomico, ruta_banco(), snapshot)
+        async with bot._banco_persist_lock:
+            await asyncio.to_thread(guardar_json_atomico, ruta_banco(), snapshot)
 ```
 
 Todos los slash commands se envuelven al registrarse:
@@ -131,6 +141,9 @@ async def depositar(interaction: discord.Interaction, monto: int):
     bot = get_bot()
     bot.check_user(interaction.user.id)      # Crea cuenta si no existe
     datos = bot.banco[str(interaction.user.id)]
+    if monto <= 0:
+        await interaction.response.send_message("❌ El monto debe ser positivo.", ephemeral=True)
+        return
     if datos["balance"] < monto:
         await interaction.response.send_message("❌ Saldo insuficiente.", ephemeral=True)
         return
@@ -166,7 +179,8 @@ async def registrar_contrato_fs22(interaction, tipo: str):
 
 ```python
 async def bloquear_si_arrestado(interaction, banco) -> bool:
-    if not esta_arrestado(banco[str(interaction.user.id)]):
+    uid = str(interaction.user.id)
+    if uid not in banco or not esta_arrestado(banco[uid]):
         return False
     await interaction.response.send_message(MENSAJE_BLOQUEO_ARRESTO, ephemeral=True)
     return True
@@ -216,12 +230,13 @@ else:
 
 ```python
 class TiendaLegalView(ui.View):
-    def __init__(self):
+    def __init__(self, banco):
         super().__init__(timeout=None)  # Persistente
+        self.banco = banco
 
     @ui.button(label="Comprar", custom_id="vct_tienda_legal_comprar")
     async def comprar(self, interaction, button):
-        if await bloquear_si_arrestado(interaction):
+        if await bloquear_si_arrestado(interaction, self.banco):
             return
         # lógica compra...
 ```
@@ -238,6 +253,8 @@ class TiendaLegalView(ui.View):
 | Discord SKU | `monetization.py` | Rol Socio VCT + `/verificar_socio_vct` |
 
 ```python
+SKU_SOCIO_VCT = int(_cargar_variable_env("DISCORD_SKU_SOCIO_VCT_ID", "0") or "0")
+
 async for ent in bot.entitlements(exclude_ended=True):
     if ent.sku_id == SKU_SOCIO_VCT:
         await otorgar_rol_socio_vct(miembro)
@@ -265,7 +282,7 @@ Carpeta [`ejemplos/`](ejemplos/):
 - `discord.py` 2.x — API Discord
 - `aiohttp` — webhook Ko-fi
 - JSON local — sin base de datos externa
-- `systemd` — servicio 24/7 en Linux
+- Servicio 24/7 en Linux
 
 ---
 

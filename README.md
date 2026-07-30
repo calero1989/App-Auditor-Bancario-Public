@@ -45,7 +45,7 @@ https://github.com/calero1989/App-Auditor-Bancario-Public/raw/main/informes/Info
 
 ## Configuración (solo referencia)
 
-Ver `kofi.env.example` para saber qué variables usa el bot (sin valores reales). No incluye token ni secretos.
+Ver `kofi.env.example` para saber qué variables usa el bot (**solo placeholders**, sin valores reales). No incluye token ni secretos.
 
 ## Autor
 
