@@ -1,6 +1,8 @@
 """
 Serialización de mutaciones del banco en memoria.
 Evita condiciones de carrera; el fsync corre fuera del lock (hilo).
+Los callbacks de botones/menús persistentes deben usar transaccion_banco()
+explícitamente, porque no pasan por el wrapper de slash commands.
 """
 from __future__ import annotations
 

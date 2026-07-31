@@ -121,6 +121,10 @@ def register_commands(tree):
     envolver_arbol_comandos(tree)  # ← último paso
 ```
 
+Los callbacks de `discord.ui.View` (botones/menús persistentes) no pasan por
+`CommandTree`, así que las tiendas que mutan saldos deben entrar explícitamente
+en `transaccion_banco()` dentro del handler.
+
 ---
 
 ## 6. Comando slash típico
@@ -216,14 +220,16 @@ else:
 
 ```python
 class TiendaLegalView(ui.View):
-    def __init__(self):
+    def __init__(self, banco):
         super().__init__(timeout=None)  # Persistente
+        self.banco = banco
 
     @ui.button(label="Comprar", custom_id="vct_tienda_legal_comprar")
     async def comprar(self, interaction, button):
-        if await bloquear_si_arrestado(interaction):
-            return
-        # lógica compra...
+        async with transaccion_banco():
+            if await bloquear_si_arrestado(interaction, self.banco):
+                return
+            # validar saldo → descontar → conceder item...
 ```
 
 `custom_id` fijo permite que el bot recuerde botones tras reinicio.
