@@ -239,9 +239,13 @@ class TiendaLegalView(ui.View):
 
 ```python
 async for ent in bot.entitlements(exclude_ended=True):
-    if ent.sku_id == SKU_SOCIO_VCT:
+    if ent.sku_id == SKU_SOCIO_VCT and ent.user_id == miembro.id:
         await otorgar_rol_socio_vct(miembro)
 ```
+
+La verificación cruza siempre SKU y propietario de la suscripción; un entitlement
+activo de otro usuario nunca debe conceder el rol al miembro que ejecuta el
+comando.
 
 ---
 
