@@ -101,13 +101,33 @@ Cada cuenta de jugador es un objeto en `banco_vct.json` indexado por ID Discord.
 El `fsync` del JSON no debe bloquear el event loop ni otros slash (límite Discord 3 s). Tras mutar en memoria se hace snapshot y se persiste en un hilo:
 
 ```python
+from contextvars import ContextVar
+
+
+_post_commit_actual = ContextVar("_post_commit_actual", default=None)
+
+
+def al_confirmar_persistencia(callback):
+    callbacks = _post_commit_actual.get()
+    if callbacks is None:
+        raise RuntimeError("requiere transaccion_banco activa")
+    callbacks.append(callback)
+
+
 @asynccontextmanager
 async def transaccion_banco(*, persistir: bool = True):
+    callbacks = []
     async with bot._banco_lock:
-        yield bot
-        snapshot = copy.deepcopy(bot.banco) if persistir else None
+        token = _post_commit_actual.set(callbacks)
+        try:
+            yield bot
+            snapshot = copy.deepcopy(bot.banco) if persistir else None
+        finally:
+            _post_commit_actual.reset(token)
     if snapshot is not None:
         await asyncio.to_thread(guardar_json_atomico, ruta_banco(), snapshot)
+        for callback in callbacks:
+            await callback()
 ```
 
 Todos los slash commands se envuelven al registrarse:
@@ -128,19 +148,23 @@ def register_commands(tree):
 ```python
 @tree.command(name="depositar", description="Mover dinero de cartera a caja fuerte")
 async def depositar(interaction: discord.Interaction, monto: int):
+    await interaction.response.defer(ephemeral=True)
     bot = get_bot()
     bot.check_user(interaction.user.id)      # Crea cuenta si no existe
     datos = bot.banco[str(interaction.user.id)]
     if datos["balance"] < monto:
-        await interaction.response.send_message("❌ Saldo insuficiente.", ephemeral=True)
+        await interaction.followup.send("❌ Saldo insuficiente.", ephemeral=True)
         return
     datos["balance"] -= monto
     datos["vault"] += monto
-    bot.guardar_datos()
-    await interaction.response.send_message(f"✅ Guardados {monto} €", ephemeral=True)
+
+    async def confirmar_guardado():
+        await interaction.followup.send(f"✅ Guardados {monto} €", ephemeral=True)
+
+    al_confirmar_persistencia(confirmar_guardado)
 ```
 
-*(En producción el `guardar_datos` ocurre dentro del lock automático.)*
+*(En producción el guardado ocurre dentro del lock automático; las respuestas de éxito que prometen persistencia se envían después de confirmar el snapshot.)*
 
 ---
 
