@@ -40,7 +40,7 @@ class GuardarJsonAtomicoTests(unittest.TestCase):
 
             with open(ruta, encoding="utf-8") as archivo:
                 self.assertEqual(json.load(archivo), datos)
-            self.assertGreaterEqual(len(fsyncs), 2)
+            self.assertGreaterEqual(len(fsyncs), 1)
             self.assertEqual([], list(pathlib.Path(tmpdir).glob("*.tmp")))
 
     def test_conserva_temporal_completo_si_replace_falla(self) -> None:

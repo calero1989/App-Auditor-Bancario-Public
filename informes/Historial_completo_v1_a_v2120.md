@@ -383,7 +383,7 @@ Resumen del ecosistema: economía legal e ilegal, FS22, inactividad, prisión, t
 
 - **Patreon:** https://patreon.com/calero89
 - **GitHub público (docs):** https://github.com/calero1989/App-Auditor-Bancario-Public
-- **Versión en producción:** 2.12.11
+- **Versión en producción:** 2.12.0
 - **Comando en Discord:** `/version` · `/nivel_vct`
 
 *Informe público sin credenciales ni datos personales de jugadores.*

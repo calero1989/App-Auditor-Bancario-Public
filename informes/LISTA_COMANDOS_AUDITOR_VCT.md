@@ -1,11 +1,11 @@
 # 📋 Comandos del Auditor Bancario VCT
 
-**Versión:** 2.12.11 · **Vanilla Center Trust [VCT]** · **~87 comandos**  
+**Versión:** 2.9.3 · **Vanilla Center Trust [VCT]** · **88 comandos**  
 **Autor:** Angel del Valle Calero (calero89) · © 2026
 
 > En Discord escribe `/` y el nombre del comando.  
 > Lo que ocurre en FS22/Luna **solo cuenta** si lo declaras aquí (salvo registro directo por staff).  
-> **¿Primera vez?** Lee **[Resumen_publico_v1.md](Resumen_publico_v1.md)** o **[Informe_completo_VCT.md](Informe_completo_VCT.md)**.
+> **¿Primera vez?** Lee **[GUIA_INICIO_VCT.md](GUIA_INICIO_VCT.md)**.
 
 ---
 
@@ -14,6 +14,7 @@
 | Comando | Función |
 |---------|---------|
 | `/version` | Versión del bot e historial de cambios |
+| `/novedades` | Igual que `/version` |
 | `/tienda_vct` | Catálogo interactivo Socio VCT (botón suscripción Discord) · canal 💳-tienda_vct |
 | `/verificar_socio_vct` | Comprueba tu suscripción y otorga el rol Socio VCT |
 | `/mis_pendientes_vct` | Panel de todo lo pendiente (extorsión, préstamos, FS22, atracos, etc.) |
@@ -186,7 +187,7 @@
 ## 📌 Texto corto para Discord (copiar y pegar)
 
 ```
-📋 COMANDOS AUDITOR BANCARIO VCT v2.12.11 (~87)
+📋 COMANDOS AUDITOR BANCARIO VCT v2.9.3 (88)
 
 🏦 BANCO
 /bal · /depositar · /retirar · /transferencia · /pagar
@@ -228,7 +229,7 @@ Staff: /pendientes_fs22 · /aceptar_trabajo_fs22 · /rechazar_trabajo_fs22
 /tienda_vct · /verificar_socio_vct · /mis_pendientes_vct
 
 📋 /ticket · /clear · /inspeccionar (staff)
-/version
+/version · /novedades
 
 En FS22 solo cuenta lo certificado en Discord.
 — Angel del Valle Calero · Vanilla Center Trust [VCT]
