@@ -75,22 +75,40 @@ import os
 import time
 
 
+def _fsync_directorio(ruta: str) -> None:
+    directorio = os.path.dirname(os.path.abspath(ruta)) or "."
+    try:
+        fd = os.open(directorio, os.O_RDONLY)
+    except OSError:
+        return
+    try:
+        os.fsync(fd)
+    finally:
+        os.close(fd)
+
+
 def guardar_json_atomico(ruta: str, datos) -> None:
-    """Escribe `datos` en `ruta` vía fichero temporal + replace + fsync."""
+    """Escribe `datos` en `ruta` vía temporal + replace + fsync."""
     temporal = f"{ruta}.{os.getpid()}.{time.time_ns()}.tmp"
+    temporal_completo = False
     try:
         with open(temporal, "w", encoding="utf-8") as f:
             json.dump(datos, f, indent=4, ensure_ascii=False)
             f.flush()
             os.fsync(f.fileno())
+        temporal_completo = True
         os.replace(temporal, ruta)  # Atómico en POSIX/Windows
-    finally:
-        if os.path.exists(temporal):
+        _fsync_directorio(ruta)
+    except Exception:
+        if not temporal_completo and os.path.exists(temporal):
             try:
                 os.remove(temporal)
             except OSError:
                 pass
+        raise
 ```
+
+Si `replace` falla tras escribir el temporal completo, **no** se borra el `.tmp`: queda para recuperación manual. Solo se eliminan temporales **parciales** (serialización interrumpida).
 
 Cada cuenta de jugador es un objeto en `banco_vct.json` indexado por ID Discord.
 
@@ -98,16 +116,54 @@ Cada cuenta de jugador es un objeto en `banco_vct.json` indexado por ID Discord.
 
 ## 5. Lock anti double-spend (`banco_sync.py`)
 
-El `fsync` del JSON no debe bloquear el event loop ni otros slash (límite Discord 3 s). Tras mutar en memoria se hace snapshot y se persiste en un hilo:
+El `fsync` del JSON no debe bloquear el event loop ni otros slash (límite Discord 3 s). Tras mutar en memoria se hace snapshot (también si el comando falla) y se persiste en un hilo; los guardados se serializan para que una foto antigua no sobrescriba una más reciente. Las transacciones anidadas reutilizan el mismo lock externo (sin deadlock).
 
 ```python
+import asyncio
+import copy
+from collections.abc import Awaitable, Callable
+from contextlib import asynccontextmanager
+from contextvars import ContextVar
+
+PostCommit = Callable[[], Awaitable[None]]
+_profundidad = ContextVar("_profundidad", default=0)
+_post_commit_actual = ContextVar("_post_commit_actual", default=None)
+
+
+def al_confirmar_persistencia(callback: PostCommit) -> None:
+    callbacks = _post_commit_actual.get()
+    if callbacks is None:
+        raise RuntimeError("requiere transaccion_banco activa")
+    callbacks.append(callback)
+
+
 @asynccontextmanager
 async def transaccion_banco(*, persistir: bool = True):
+    if _profundidad.get():
+        token = _profundidad.set(_profundidad.get() + 1)
+        try:
+            yield bot
+        finally:
+            _profundidad.reset(token)
+        return
+
+    callbacks: list[PostCommit] = []
     async with bot._banco_lock:
-        yield bot
-        snapshot = copy.deepcopy(bot.banco) if persistir else None
+        depth_token = _profundidad.set(1)
+        pc_token = _post_commit_actual.set(callbacks)
+        snapshot = None
+        try:
+            yield bot
+        finally:
+            if persistir:
+                snapshot = copy.deepcopy(bot.banco)
+            _post_commit_actual.reset(pc_token)
+            _profundidad.reset(depth_token)
     if snapshot is not None:
-        await asyncio.to_thread(guardar_json_atomico, ruta_banco(), snapshot)
+        async with bot._banco_persist_lock:
+            await asyncio.to_thread(guardar_json_atomico, ruta_banco(), snapshot)
+        for callback in callbacks:
+            await callback()
 ```
 
 Todos los slash commands se envuelven al registrarse:
@@ -121,6 +177,8 @@ def register_commands(tree):
     envolver_arbol_comandos(tree)  # ← último paso
 ```
 
+Los callbacks de `discord.ui.View` (botones/menús persistentes) **no** pasan por `CommandTree`, así que las tiendas que mutan saldos deben entrar explícitamente en `transaccion_banco()` dentro del handler.
+
 ---
 
 ## 6. Comando slash típico
@@ -128,19 +186,26 @@ def register_commands(tree):
 ```python
 @tree.command(name="depositar", description="Mover dinero de cartera a caja fuerte")
 async def depositar(interaction: discord.Interaction, monto: int):
+    await interaction.response.defer(ephemeral=True)
     bot = get_bot()
     bot.check_user(interaction.user.id)      # Crea cuenta si no existe
     datos = bot.banco[str(interaction.user.id)]
+    if monto <= 0:
+        await interaction.followup.send("❌ El monto debe ser positivo.", ephemeral=True)
+        return
     if datos["balance"] < monto:
-        await interaction.response.send_message("❌ Saldo insuficiente.", ephemeral=True)
+        await interaction.followup.send("❌ Saldo insuficiente.", ephemeral=True)
         return
     datos["balance"] -= monto
     datos["vault"] += monto
-    bot.guardar_datos()
-    await interaction.response.send_message(f"✅ Guardados {monto} €", ephemeral=True)
+
+    async def confirmar_guardado():
+        await interaction.followup.send(f"✅ Guardados {monto} €", ephemeral=True)
+
+    al_confirmar_persistencia(confirmar_guardado)
 ```
 
-*(En producción el `guardar_datos` ocurre dentro del lock automático.)*
+*(En producción el guardado ocurre dentro del lock automático; las respuestas de éxito que prometen persistencia se envían **después** de confirmar el snapshot.)*
 
 ---
 
@@ -166,9 +231,18 @@ async def registrar_contrato_fs22(interaction, tipo: str):
 
 ```python
 async def bloquear_si_arrestado(interaction, banco) -> bool:
-    if not esta_arrestado(banco[str(interaction.user.id)]):
+    if interaction.user.bot:
         return False
-    await interaction.response.send_message(MENSAJE_BLOQUEO_ARRESTO, ephemeral=True)
+    uid = str(interaction.user.id)
+    if uid not in banco or not esta_arrestado(banco[uid]):
+        return False
+    try:
+        if interaction.response.is_done():
+            await interaction.followup.send(MENSAJE_BLOQUEO_ARRESTO, ephemeral=True)
+        else:
+            await interaction.response.send_message(MENSAJE_BLOQUEO_ARRESTO, ephemeral=True)
+    except discord.HTTPException:
+        pass
     return True
 ```
 
@@ -216,14 +290,16 @@ else:
 
 ```python
 class TiendaLegalView(ui.View):
-    def __init__(self):
+    def __init__(self, banco):
         super().__init__(timeout=None)  # Persistente
+        self.banco = banco
 
     @ui.button(label="Comprar", custom_id="vct_tienda_legal_comprar")
     async def comprar(self, interaction, button):
-        if await bloquear_si_arrestado(interaction):
-            return
-        # lógica compra...
+        async with transaccion_banco():
+            if await bloquear_si_arrestado(interaction, self.banco):
+                return
+            # validar saldo → descontar → conceder item...
 ```
 
 `custom_id` fijo permite que el bot recuerde botones tras reinicio.
@@ -238,10 +314,14 @@ class TiendaLegalView(ui.View):
 | Discord SKU | `monetization.py` | Rol Socio VCT + `/verificar_socio_vct` |
 
 ```python
+SKU_SOCIO_VCT = int(_cargar_variable_env("DISCORD_SKU_SOCIO_VCT_ID", "0") or "0")
+
 async for ent in bot.entitlements(exclude_ended=True):
-    if ent.sku_id == SKU_SOCIO_VCT:
+    if ent.sku_id == SKU_SOCIO_VCT and ent.user_id == miembro.id:
         await otorgar_rol_socio_vct(miembro)
 ```
+
+La verificación cruza siempre SKU y propietario de la suscripción; un entitlement activo de otro usuario nunca debe conceder el rol al miembro que ejecuta el comando.
 
 ---
 
@@ -256,7 +336,7 @@ Carpeta [`ejemplos/`](ejemplos/):
 | `03_guard_arresto_tiendas.py` | Bloqueo reclusos |
 | `04_fs22_autocomplete.py` | Autocompletado |
 | `05_lock_transacciones_banco.py` | Lock async |
-| `06_persistencia_json_atomica.py` | JSON atómico (tmp + fsync) |
+| `06_persistencia_json_atomica.py` | JSON atómico (tmp + replace + fsync archivo/directorio) |
 
 ---
 
@@ -265,8 +345,8 @@ Carpeta [`ejemplos/`](ejemplos/):
 - `discord.py` 2.x — API Discord
 - `aiohttp` — webhook Ko-fi
 - JSON local — sin base de datos externa
-- `systemd` — servicio 24/7 en Linux
+- Servicio 24/7 en Linux
 
 ---
 
-© 2026 Angel del Valle Calero · Vanilla Center Trust [VCT] · Informe público de código · v2.9.7
+© 2026 Angel del Valle Calero · Vanilla Center Trust [VCT] · Informe público de código · v2.12.11

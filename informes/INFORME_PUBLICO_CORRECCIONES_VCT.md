@@ -145,12 +145,12 @@ El Auditor maneja **dinero virtual con valor de rol**. Un bug que duplique saldo
 ## 8. Proceso de despliegue de un parche
 
 ```
-1. Corregir en PC local (vct_auditor/)
-2. Actualizar version.py + changelog.py
+1. Corregir en el entorno de desarrollo
+2. Actualizar versión y changelog
 3. Probar en entorno de prueba si existe
-4. scp archivos modificados al VPS
-5. systemctl restart vct-bot
-6. Verificar journalctl + /version en Discord
+4. Publicar el parche en el servidor de producción
+5. Reiniciar el servicio del bot
+6. Verificar logs + /version en Discord
 7. Anuncio en canal noticias (opcional)
 ```
 
