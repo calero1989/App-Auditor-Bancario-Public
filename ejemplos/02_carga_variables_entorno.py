@@ -7,10 +7,26 @@ from __future__ import annotations
 import os
 
 
+def _valor_proceso_definido(valor: str | None) -> str | None:
+    """None / vacío / solo espacios → no definido (permite caer a kofi.env)."""
+    if valor is None:
+        return None
+    limpio = valor.strip()
+    return limpio if limpio else None
+
+
+def _clave_linea_env(clave: str) -> str:
+    """Acepta `KEY` y `export KEY` (estilo shell)."""
+    clave = clave.strip()
+    if clave.startswith("export ") or clave.startswith("export\t"):
+        clave = clave.split(None, 1)[1] if len(clave.split(None, 1)) > 1 else ""
+    return clave.strip()
+
+
 def _cargar_variable_env(nombre: str, predeterminado: str = "") -> str:
-    valor = os.getenv(nombre)
-    if valor:
-        return valor.strip()
+    valor = _valor_proceso_definido(os.getenv(nombre))
+    if valor is not None:
+        return valor
     ruta_env = os.path.join(os.path.dirname(__file__), "..", "kofi.env")
     if os.path.exists(ruta_env):
         with open(ruta_env, encoding="utf-8") as archivo:
@@ -19,7 +35,7 @@ def _cargar_variable_env(nombre: str, predeterminado: str = "") -> str:
                 if not linea or linea.startswith("#") or "=" not in linea:
                     continue
                 clave, _, texto = linea.partition("=")
-                if clave.strip() == nombre:
+                if _clave_linea_env(clave) == nombre:
                     return texto.strip().strip('"').strip("'")
     return predeterminado
 
