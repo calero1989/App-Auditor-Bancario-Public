@@ -9,7 +9,7 @@ import os
 
 def _cargar_variable_env(nombre: str, predeterminado: str = "") -> str:
     valor = os.getenv(nombre)
-    if valor:
+    if valor is not None and valor.strip():
         return valor.strip()
     ruta_env = os.path.join(os.path.dirname(__file__), "..", "kofi.env")
     if os.path.exists(ruta_env):
@@ -19,7 +19,10 @@ def _cargar_variable_env(nombre: str, predeterminado: str = "") -> str:
                 if not linea or linea.startswith("#") or "=" not in linea:
                     continue
                 clave, _, texto = linea.partition("=")
-                if clave.strip() == nombre:
+                clave = clave.strip()
+                if clave.startswith("export "):
+                    clave = clave.removeprefix("export ").strip()
+                if clave == nombre:
                     return texto.strip().strip('"').strip("'")
     return predeterminado
 
