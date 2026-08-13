@@ -13,7 +13,7 @@ Material **público** del proyecto **Vanilla Center Trust [VCT]**: bot de econom
 - Tiendas interactivas, alarma de seguridad, persecución y arresto (v2.9.x)
 - En desarrollo: servidor de juego dedicado e integración bot ↔ partida
 
-**Versión documentada:** **2.9.4** (Jun 2026) — parches de seguridad economía.
+**Versión documentada:** **2.12.11** (Jun 2026) — incluye parches de inactividad, contrabando y seguridad economía.
 
 ## Documentación
 
@@ -21,13 +21,13 @@ Material **público** del proyecto **Vanilla Center Trust [VCT]**: bot de econom
 |---------|-------------|
 | [informes/Resumen_publico_v1.md](informes/Resumen_publico_v1.md) | Resumen para Patreon / nuevos ciudadanos |
 | [informes/Resumen_publico_v1.pdf](informes/Resumen_publico_v1.pdf) | Misma información en PDF |
-| [informes/LISTA_COMANDOS_AUDITOR_VCT.md](informes/LISTA_COMANDOS_AUDITOR_VCT.md) | Lista de comandos slash (~89) |
+| [informes/LISTA_COMANDOS_AUDITOR_VCT.md](informes/LISTA_COMANDOS_AUDITOR_VCT.md) | Lista de comandos slash (~87) |
 | [**informes/Informe_completo_VCT.pdf**](informes/Informe_completo_VCT.pdf) | **Informe completo en PDF** (economía, comandos, FS22 — sin datos técnicos sensibles) |
 | [informes/Informe_completo_VCT.md](informes/Informe_completo_VCT.md) | Mismo informe en Markdown |
 | [informes/INFORME_PUBLICO_CODIGO_VCT.md](informes/INFORME_PUBLICO_CODIGO_VCT.md) · [PDF](informes/INFORME_PUBLICO_CODIGO_VCT.pdf) | Código fuente explicado (público) |
 | [informes/INFORME_PUBLICO_CORRECCIONES_VCT.md](informes/INFORME_PUBLICO_CORRECCIONES_VCT.md) · [PDF](informes/INFORME_PUBLICO_CORRECCIONES_VCT.pdf) | Parches y corrección de errores |
 | [informes/INFORME_PUBLICO_PLANTILLAS_COMERCIO_VCT.md](informes/INFORME_PUBLICO_PLANTILLAS_COMERCIO_VCT.md) · [PDF](informes/INFORME_PUBLICO_PLANTILLAS_COMERCIO_VCT.pdf) | **Catálogo** del pack de plantillas (código completo = beneficio de pago) |
-| [informes/anuncios/](informes/anuncios/) | Anuncios de actualización (2.2 … **2.9.7**) |
+| [informes/anuncios/](informes/anuncios/) | Anuncios de actualización (2.1 … 2.9.4) |
 | [ejemplos/](ejemplos/) | **Fragmentos de código depurados** (economía, FS22, guards, locks) |
 
 ### Enlace directo para compartir el PDF
