@@ -4,6 +4,16 @@ Material **público** del proyecto **Vanilla Center Trust [VCT]**: bot de econom
 
 > El código del bot y el panel de administración están en el repositorio privado [App-Auditor-Bancario](https://github.com/calero1989/App-Auditor-Bancario). Aquí encontrarás documentación para jugadores y mecenas (nivel gratuito).
 
+## Portafolio (enlace para compartir)
+
+**[PORTAFOLIO_AUDITOR_BANCARIO_VCT.md](PORTAFOLIO_AUDITOR_BANCARIO_VCT.md)** — contexto, reto, proceso y resultados (CV / LinkedIn).
+
+Enlace directo:
+
+```
+https://github.com/calero1989/App-Auditor-Bancario-Public/blob/main/PORTAFOLIO_AUDITOR_BANCARIO_VCT.md
+```
+
 ## ¿Qué es?
 
 - Cuentas bancarias virtuales (NRB, cartera, caja fuerte, dinero negro)
@@ -19,6 +29,7 @@ Material **público** del proyecto **Vanilla Center Trust [VCT]**: bot de econom
 
 | Archivo | Descripción |
 |---------|-------------|
+| [**PORTAFOLIO_AUDITOR_BANCARIO_VCT.md**](PORTAFOLIO_AUDITOR_BANCARIO_VCT.md) | **Portafolio** — contexto, reto, proceso y resultados (para CV / LinkedIn) |
 | [informes/Resumen_publico_v1.md](informes/Resumen_publico_v1.md) | Resumen para Patreon / nuevos ciudadanos |
 | [informes/Resumen_publico_v1.pdf](informes/Resumen_publico_v1.pdf) | Misma información en PDF |
 | [informes/LISTA_COMANDOS_AUDITOR_VCT.md](informes/LISTA_COMANDOS_AUDITOR_VCT.md) | Lista de comandos slash (~87) |
