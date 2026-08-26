@@ -98,7 +98,11 @@ def guardar_json_atomico(ruta: str, datos) -> None:
             os.fsync(f.fileno())
         temporal_completo = True
         os.replace(temporal, ruta)  # Atómico en POSIX/Windows
-        _fsync_directorio(ruta)
+        try:
+            _fsync_directorio(ruta)
+        except OSError:
+            # El replace ya confirmó el nuevo archivo; no reportes fallo y provoques reintentos dobles.
+            pass
     except Exception:
         if not temporal_completo and os.path.exists(temporal):
             try:
@@ -108,7 +112,7 @@ def guardar_json_atomico(ruta: str, datos) -> None:
         raise
 ```
 
-Si `replace` falla tras escribir el temporal completo, **no** se borra el `.tmp`: queda para recuperación manual. Solo se eliminan temporales **parciales** (serialización interrumpida).
+Si `replace` falla tras escribir el temporal completo, **no** se borra el `.tmp`: queda para recuperación manual. Solo se eliminan temporales **parciales** (serialización interrumpida). Si el `fsync` del directorio falla después del `replace`, no se reporta como fallo de guardado: el JSON nuevo ya quedó publicado y relanzar el error podría provocar reintentos dobles.
 
 Cada cuenta de jugador es un objeto en `banco_vct.json` indexado por ID Discord.
 

@@ -65,6 +65,22 @@ class GuardarJsonAtomicoTests(unittest.TestCase):
                 {"saldo": 2},
             )
 
+    def test_no_falla_si_fsync_directorio_falla_tras_replace(self) -> None:
+        modulo = _cargar_modulo()
+        with tempfile.TemporaryDirectory() as tmpdir:
+            ruta = pathlib.Path(tmpdir) / "banco.json"
+            ruta.write_text('{"saldo": 1}', encoding="utf-8")
+
+            with mock.patch.object(
+                modulo,
+                "_fsync_directorio",
+                side_effect=OSError("fsync directorio fallido"),
+            ):
+                modulo.guardar_json_atomico(str(ruta), {"saldo": 2})
+
+            self.assertEqual(json.loads(ruta.read_text(encoding="utf-8")), {"saldo": 2})
+            self.assertEqual(list(pathlib.Path(tmpdir).glob("banco.json.*.tmp")), [])
+
     def test_elimina_temporal_parcial_si_serializacion_falla(self) -> None:
         modulo = _cargar_modulo()
         with tempfile.TemporaryDirectory() as tmpdir:

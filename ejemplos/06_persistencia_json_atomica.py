@@ -34,7 +34,11 @@ def guardar_json_atomico(ruta: str, datos) -> None:
             os.fsync(f.fileno())
         temporal_completo = True
         os.replace(temporal, ruta)  # Atómico en POSIX/Windows
-        _fsync_directorio(ruta)
+        try:
+            _fsync_directorio(ruta)
+        except OSError:
+            # El replace ya confirmó el nuevo archivo; no reportes fallo y provoques reintentos dobles.
+            pass
     except Exception:
         if not temporal_completo and os.path.exists(temporal):
             try:
