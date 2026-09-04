@@ -13,7 +13,11 @@ MENSAJE_BLOQUEO_ARRESTO = (
 
 
 def esta_arrestado(datos_cuenta: dict) -> bool:
-    return int(datos_cuenta.get("arresto_trabajos_pendientes", 0)) > 0
+    trabajos_pendientes = datos_cuenta.get("arresto_trabajos_pendientes") or 0
+    try:
+        return int(trabajos_pendientes) > 0
+    except (TypeError, ValueError):
+        return False
 
 
 async def bloquear_si_arrestado(interaction: discord.Interaction, banco: dict) -> bool:
