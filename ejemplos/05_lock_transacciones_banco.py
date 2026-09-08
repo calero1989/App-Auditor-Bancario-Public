@@ -31,6 +31,7 @@ class TransaccionBanco:
     def __init__(self, estado_banco: EstadoBanco) -> None:
         self.estado = estado_banco
         self._post_commit: list[PostCommit] = []
+        self._confirmada = False
 
     @property
     def cuentas(self) -> dict:
@@ -38,6 +39,9 @@ class TransaccionBanco:
 
     def despues_de_persistir(self, callback: PostCommit) -> None:
         self._post_commit.append(callback)
+
+    def confirmar(self) -> None:
+        self._confirmada = True
 
 
 estado = EstadoBanco()
@@ -57,6 +61,14 @@ def al_confirmar_persistencia(callback: PostCommit) -> None:
     if tx is None:
         raise RuntimeError("al_confirmar_persistencia requiere transaccion_banco activa")
     tx.despues_de_persistir(callback)
+
+
+def confirmar_transaccion_banco() -> None:
+    """Marca la transacción como válida para persistir al salir del contexto."""
+    tx = _transaccion_actual.get()
+    if tx is None:
+        raise RuntimeError("confirmar_transaccion_banco requiere transaccion_banco activa")
+    tx.confirmar()
 
 
 def guardar_banco(cuentas: dict) -> None:
@@ -80,11 +92,15 @@ async def transaccion_banco(*, persistir: bool = True):
         depth_token = _profundidad_transaccion_banco.set(1)
         tx_token = _transaccion_actual.set(tx)
         snapshot = None
+        snapshot_anterior = copy.deepcopy(estado.cuentas) if persistir else None
         try:
             yield estado
         finally:
-            if persistir:
+            if persistir and tx._confirmada:
                 snapshot = copy.deepcopy(estado.cuentas)
+            elif persistir and snapshot_anterior is not None:
+                estado.cuentas.clear()
+                estado.cuentas.update(snapshot_anterior)
             _transaccion_actual.reset(tx_token)
             _profundidad_transaccion_banco.reset(depth_token)
 
