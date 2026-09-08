@@ -116,7 +116,7 @@ Cada cuenta de jugador es un objeto en `banco_vct.json` indexado por ID Discord.
 
 ## 5. Lock anti double-spend (`banco_sync.py`)
 
-El `fsync` del JSON no debe bloquear el event loop ni otros slash (límite Discord 3 s). Tras mutar en memoria se hace snapshot (también si el comando falla) y se persiste en un hilo; los guardados se serializan para que una foto antigua no sobrescriba una más reciente. Las transacciones anidadas reutilizan el mismo lock externo (sin deadlock).
+El `fsync` del JSON no debe bloquear el event loop ni otros slash (límite Discord 3 s). Cada comando valida, muta y marca explícitamente la transacción como confirmada; si un flujo de error hace `return` antes de confirmar, se restaura la foto anterior y no se persiste estado parcial. Las transacciones anidadas reutilizan el mismo lock externo (sin deadlock).
 
 ```python
 import asyncio
@@ -127,14 +127,31 @@ from contextvars import ContextVar
 
 PostCommit = Callable[[], Awaitable[None]]
 _profundidad = ContextVar("_profundidad", default=0)
-_post_commit_actual = ContextVar("_post_commit_actual", default=None)
+_transaccion_actual = ContextVar("_transaccion_actual", default=None)
+
+
+class TransaccionBanco:
+    def __init__(self, bot):
+        self.bot = bot
+        self.post_commit: list[PostCommit] = []
+        self.confirmada = False
+
+    def confirmar(self) -> None:
+        self.confirmada = True
 
 
 def al_confirmar_persistencia(callback: PostCommit) -> None:
-    callbacks = _post_commit_actual.get()
-    if callbacks is None:
+    tx = _transaccion_actual.get()
+    if tx is None:
         raise RuntimeError("requiere transaccion_banco activa")
-    callbacks.append(callback)
+    tx.post_commit.append(callback)
+
+
+def confirmar_transaccion_banco() -> None:
+    tx = _transaccion_actual.get()
+    if tx is None:
+        raise RuntimeError("requiere transaccion_banco activa")
+    tx.confirmar()
 
 
 @asynccontextmanager
@@ -147,22 +164,26 @@ async def transaccion_banco(*, persistir: bool = True):
             _profundidad.reset(token)
         return
 
-    callbacks: list[PostCommit] = []
+    tx = TransaccionBanco(bot)
     async with bot._banco_lock:
         depth_token = _profundidad.set(1)
-        pc_token = _post_commit_actual.set(callbacks)
+        tx_token = _transaccion_actual.set(tx)
         snapshot = None
+        snapshot_anterior = copy.deepcopy(bot.banco) if persistir else None
         try:
             yield bot
         finally:
-            if persistir:
+            if persistir and tx.confirmada:
                 snapshot = copy.deepcopy(bot.banco)
-            _post_commit_actual.reset(pc_token)
+            elif persistir and snapshot_anterior is not None:
+                bot.banco.clear()
+                bot.banco.update(snapshot_anterior)
+            _transaccion_actual.reset(tx_token)
             _profundidad.reset(depth_token)
     if snapshot is not None:
         async with bot._banco_persist_lock:
             await asyncio.to_thread(guardar_json_atomico, ruta_banco(), snapshot)
-        for callback in callbacks:
+        for callback in tx.post_commit:
             await callback()
 ```
 
@@ -203,9 +224,10 @@ async def depositar(interaction: discord.Interaction, monto: int):
         await interaction.followup.send(f"✅ Guardados {monto} €", ephemeral=True)
 
     al_confirmar_persistencia(confirmar_guardado)
+    confirmar_transaccion_banco()
 ```
 
-*(En producción el guardado ocurre dentro del lock automático; las respuestas de éxito que prometen persistencia se envían **después** de confirmar el snapshot.)*
+*(En producción el guardado ocurre dentro del lock automático; una salida temprana de validación no confirmada revierte los cambios en memoria. Las respuestas de éxito que prometen persistencia se envían **después** de confirmar el snapshot.)*
 
 ---
 
