@@ -1,6 +1,6 @@
 # Auditor Bancario VCT — Informe público: corrección de errores y parches
 
-**Versión actual:** 2.12.11  
+**Versión actual:** 2.12.17  
 **Autor:** Angel del Valle Calero (calero89) · © 2026 · Vanilla Center Trust [VCT]  
 **Público** — transparencia sobre bugs corregidos y mejoras de seguridad económica
 
@@ -130,6 +130,10 @@ El Auditor maneja **dinero virtual con valor de rol**. Un bug que duplique saldo
 | 2.12.9 | Consolidación comandos, fix desplegable víctima atraco | Feature |
 | 2.12.10 | Contrabando filtrado por sector | Bugfix |
 | 2.12.11 | Persistencia actividad inactividad | Bugfix crítico |
+| 2.12.12–14 | Préstamos, calendario, UID nulos, deudas | Bugfix |
+| 2.12.15 | Persistencia aunque Discord falle; ACK antes de cobros lentos | Bugfix crítico |
+| 2.12.16 | Multas de inactividad a tesorería del Auditor | Diseño / destino |
+| 2.12.17 | Impuesto por cuenta, fondo encolado, flush 20 s, Ko-fi solo por ID | Bugfix crítico |
 
 ---
 

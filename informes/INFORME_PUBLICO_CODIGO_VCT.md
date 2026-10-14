@@ -1,6 +1,6 @@
 # Auditor Bancario VCT — Informe público: código fuente explicado
 
-**Versión:** 2.12.11 · **Público** — apto para GitHub, Patreon y NotebookLM  
+**Versión:** 2.12.17 · **Público** — apto para GitHub, Patreon y NotebookLM  
 **Autor:** Angel del Valle Calero (calero89) · © 2026 · Vanilla Center Trust [VCT]  
 **Sin datos de infraestructura, tokens ni IDs de servidor**
 
@@ -178,6 +178,13 @@ def register_commands(tree):
 ```
 
 Los callbacks de `discord.ui.View` (botones/menús persistentes) **no** pasan por `CommandTree`, así que las tiendas que mutan saldos deben entrar explícitamente en `transaccion_banco()` dentro del handler.
+
+Desde **2.12.17**:
+
+- El impuesto semanal se marca **por cuenta** (`impuesto_semana`); un corte a mitad del lunes no cobra dos veces.
+- Los ingresos al fondo central viajan en el mismo JSON del banco (`__vct_meta__`) y se aplican con ids (no se duplican al reintentar).
+- Chat e interacciones marcan el banco sucio y lo vuelcan como mucho cada 20 s, no en cada mensaje.
+- Ko-fi solo asigna roles con ID de Discord, nunca por apodo.
 
 ---
 
