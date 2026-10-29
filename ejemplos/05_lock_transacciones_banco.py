@@ -49,12 +49,16 @@ _transaccion_actual: ContextVar[TransaccionBanco | None] = ContextVar(
     "_transaccion_actual",
     default=None,
 )
+_tarea_transaccion_banco: ContextVar[asyncio.Task | None] = ContextVar(
+    "_tarea_transaccion_banco",
+    default=None,
+)
 
 
 def al_confirmar_persistencia(callback: PostCommit) -> None:
     """Registra una acción que solo debe ejecutarse tras guardar el snapshot."""
     tx = _transaccion_actual.get()
-    if tx is None:
+    if tx is None or _tarea_transaccion_banco.get() is not asyncio.current_task():
         raise RuntimeError("al_confirmar_persistencia requiere transaccion_banco activa")
     tx.despues_de_persistir(callback)
 
@@ -67,18 +71,26 @@ def guardar_banco(cuentas: dict) -> None:
 @asynccontextmanager
 async def transaccion_banco(*, persistir: bool = True):
     profundidad = _profundidad_transaccion_banco.get()
-    if profundidad:
+    tarea_actual = asyncio.current_task()
+    if profundidad and _tarea_transaccion_banco.get() is tarea_actual:
         token = _profundidad_transaccion_banco.set(profundidad + 1)
         try:
             yield estado
         finally:
             _profundidad_transaccion_banco.reset(token)
         return
+    if profundidad:
+        # create_task() copia ContextVar: una tarea hija debe abrir su propia
+        # transaccion para no saltarse el lock ni la persistencia.
+        _profundidad_transaccion_banco.set(0)
+        _transaccion_actual.set(None)
+        _tarea_transaccion_banco.set(None)
 
     tx = TransaccionBanco(estado)
     async with estado._lock:
         depth_token = _profundidad_transaccion_banco.set(1)
         tx_token = _transaccion_actual.set(tx)
+        task_token = _tarea_transaccion_banco.set(tarea_actual)
         snapshot = None
         try:
             yield estado
@@ -86,6 +98,7 @@ async def transaccion_banco(*, persistir: bool = True):
             if persistir:
                 snapshot = copy.deepcopy(estado.cuentas)
             _transaccion_actual.reset(tx_token)
+            _tarea_transaccion_banco.reset(task_token)
             _profundidad_transaccion_banco.reset(depth_token)
 
     if snapshot is not None:
