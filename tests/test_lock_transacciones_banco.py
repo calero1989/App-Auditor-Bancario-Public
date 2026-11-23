@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import copy
 import importlib.util
 import pathlib
 import sys
@@ -88,6 +89,37 @@ class TransaccionBancoTests(unittest.IsolatedAsyncioTestCase):
 
         await operacion()
         self.assertEqual(orden, ["persist", "ack"])
+
+    async def test_tarea_hija_abre_transaccion_propia_y_persiste(self):
+        guardados: list[dict] = []
+        continuar = asyncio.Event()
+
+        def guardar(cuentas: dict) -> None:
+            guardados.append(copy.deepcopy(cuentas))
+
+        self.mod.guardar_banco = guardar
+
+        async def operacion_hija():
+            await continuar.wait()
+            async with self.mod.transaccion_banco():
+                self.mod.estado.cuentas["hija"] = {"balance": 25}
+
+        async def operacion_padre():
+            async with self.mod.transaccion_banco():
+                self.mod.estado.cuentas["padre"] = {"balance": 10}
+                return asyncio.create_task(operacion_hija())
+
+        tarea_hija = await operacion_padre()
+        continuar.set()
+        await asyncio.wait_for(tarea_hija, timeout=1)
+
+        self.assertEqual(
+            guardados,
+            [
+                {"padre": {"balance": 10}},
+                {"padre": {"balance": 10}, "hija": {"balance": 25}},
+            ],
+        )
 
 
 if __name__ == "__main__":

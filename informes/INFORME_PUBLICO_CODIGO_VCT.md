@@ -116,7 +116,7 @@ Cada cuenta de jugador es un objeto en `banco_vct.json` indexado por ID Discord.
 
 ## 5. Lock anti double-spend (`banco_sync.py`)
 
-El `fsync` del JSON no debe bloquear el event loop ni otros slash (límite Discord 3 s). Tras mutar en memoria se hace snapshot (también si el comando falla) y se persiste en un hilo; los guardados se serializan para que una foto antigua no sobrescriba una más reciente. Las transacciones anidadas reutilizan el mismo lock externo (sin deadlock).
+El `fsync` del JSON no debe bloquear el event loop ni otros slash (límite Discord 3 s). Tras mutar en memoria se hace snapshot (también si el comando falla) y se persiste en un hilo; los guardados se serializan para que una foto antigua no sobrescriba una más reciente. Las transacciones anidadas en la misma tarea reutilizan el lock externo (sin deadlock); una tarea creada con `asyncio.create_task()` abre su propia transacción.
 
 ```python
 import asyncio
@@ -128,29 +128,36 @@ from contextvars import ContextVar
 PostCommit = Callable[[], Awaitable[None]]
 _profundidad = ContextVar("_profundidad", default=0)
 _post_commit_actual = ContextVar("_post_commit_actual", default=None)
+_tarea_actual = ContextVar("_tarea_actual", default=None)
 
 
 def al_confirmar_persistencia(callback: PostCommit) -> None:
     callbacks = _post_commit_actual.get()
-    if callbacks is None:
+    if callbacks is None or _tarea_actual.get() is not asyncio.current_task():
         raise RuntimeError("requiere transaccion_banco activa")
     callbacks.append(callback)
 
 
 @asynccontextmanager
 async def transaccion_banco(*, persistir: bool = True):
-    if _profundidad.get():
+    tarea = asyncio.current_task()
+    if _profundidad.get() and _tarea_actual.get() is tarea:
         token = _profundidad.set(_profundidad.get() + 1)
         try:
             yield bot
         finally:
             _profundidad.reset(token)
         return
+    if _profundidad.get():
+        _profundidad.set(0)
+        _post_commit_actual.set(None)
+        _tarea_actual.set(None)
 
     callbacks: list[PostCommit] = []
     async with bot._banco_lock:
         depth_token = _profundidad.set(1)
         pc_token = _post_commit_actual.set(callbacks)
+        task_token = _tarea_actual.set(tarea)
         snapshot = None
         try:
             yield bot
@@ -158,6 +165,7 @@ async def transaccion_banco(*, persistir: bool = True):
             if persistir:
                 snapshot = copy.deepcopy(bot.banco)
             _post_commit_actual.reset(pc_token)
+            _tarea_actual.reset(task_token)
             _profundidad.reset(depth_token)
     if snapshot is not None:
         async with bot._banco_persist_lock:
