@@ -148,12 +148,15 @@ async def transaccion_banco(*, persistir: bool = True):
         return
 
     callbacks: list[PostCommit] = []
+    error: BaseException | None = None
+    snapshot = None
     async with bot._banco_lock:
         depth_token = _profundidad.set(1)
         pc_token = _post_commit_actual.set(callbacks)
-        snapshot = None
         try:
             yield bot
+        except BaseException as exc:
+            error = exc
         finally:
             if persistir:
                 snapshot = copy.deepcopy(bot.banco)
@@ -162,8 +165,12 @@ async def transaccion_banco(*, persistir: bool = True):
     if snapshot is not None:
         async with bot._banco_persist_lock:
             await asyncio.to_thread(guardar_json_atomico, ruta_banco(), snapshot)
-        for callback in callbacks:
-            await callback()
+        if error is None:
+            for callback in callbacks:
+                await callback()
+
+    if error is not None:
+        raise error
 ```
 
 Todos los slash commands se envuelven al registrarse:

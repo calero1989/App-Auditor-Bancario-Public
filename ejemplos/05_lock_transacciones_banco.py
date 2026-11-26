@@ -76,12 +76,15 @@ async def transaccion_banco(*, persistir: bool = True):
         return
 
     tx = TransaccionBanco(estado)
+    error: BaseException | None = None
+    snapshot = None
     async with estado._lock:
         depth_token = _profundidad_transaccion_banco.set(1)
         tx_token = _transaccion_actual.set(tx)
-        snapshot = None
         try:
             yield estado
+        except BaseException as exc:
+            error = exc
         finally:
             if persistir:
                 snapshot = copy.deepcopy(estado.cuentas)
@@ -91,8 +94,12 @@ async def transaccion_banco(*, persistir: bool = True):
     if snapshot is not None:
         async with estado._persist_lock:
             await asyncio.to_thread(guardar_banco, snapshot)
-        for callback in tx._post_commit:
-            await callback()
+        if error is None:
+            for callback in tx._post_commit:
+                await callback()
+
+    if error is not None:
+        raise error
 
 
 def envolver_arbol_comandos(tree: app_commands.CommandTree) -> None:

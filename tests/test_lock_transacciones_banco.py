@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import copy
 import importlib.util
 import pathlib
 import sys
@@ -88,6 +89,48 @@ class TransaccionBancoTests(unittest.IsolatedAsyncioTestCase):
 
         await operacion()
         self.assertEqual(orden, ["persist", "ack"])
+
+    async def test_persiste_si_la_transaccion_falla_despues_de_mutar(self):
+        guardados: list[dict] = []
+
+        def guardar(cuentas: dict) -> None:
+            guardados.append(copy.deepcopy(cuentas))
+
+        self.mod.guardar_banco = guardar
+
+        async def operacion_fallida():
+            async with self.mod.transaccion_banco():
+                self.mod.estado.cuentas["u"] = {"balance": 77}
+                raise RuntimeError("fallo al responder a Discord")
+
+        with self.assertRaises(RuntimeError):
+            await operacion_fallida()
+
+        self.assertEqual(guardados, [{"u": {"balance": 77}}])
+        self.assertEqual(self.mod.estado.cuentas, {"u": {"balance": 77}})
+
+    async def test_no_ejecuta_post_commit_si_la_transaccion_falla(self):
+        orden: list[str] = []
+
+        def guardar(_cuentas: dict) -> None:
+            orden.append("persist")
+
+        self.mod.guardar_banco = guardar
+
+        async def operacion_fallida():
+            async with self.mod.transaccion_banco():
+                self.mod.estado.cuentas["u"] = {"balance": 1}
+
+                async def ack():
+                    orden.append("ack")
+
+                self.mod.al_confirmar_persistencia(ack)
+                raise RuntimeError("fallo despues de mutar")
+
+        with self.assertRaises(RuntimeError):
+            await operacion_fallida()
+
+        self.assertEqual(orden, ["persist"])
 
 
 if __name__ == "__main__":
