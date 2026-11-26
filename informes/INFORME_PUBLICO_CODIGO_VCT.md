@@ -116,16 +116,18 @@ Cada cuenta de jugador es un objeto en `banco_vct.json` indexado por ID Discord.
 
 ## 5. Lock anti double-spend (`banco_sync.py`)
 
-El `fsync` del JSON no debe bloquear el event loop ni otros slash (límite Discord 3 s). Tras mutar en memoria se hace snapshot (también si el comando falla) y se persiste en un hilo; los guardados se serializan para que una foto antigua no sobrescriba una más reciente. Las transacciones anidadas reutilizan el mismo lock externo (sin deadlock).
+El `fsync` del JSON no debe bloquear el event loop (se hace en hilo), pero la mutación queda serializada hasta confirmar persistencia. Si el guardado falla se restaura la foto anterior en memoria, evitando que un reintento duplique una operación que nunca llegó a disco. Las transacciones anidadas reutilizan el mismo lock externo (sin deadlock).
 
 ```python
 import asyncio
 import copy
+import logging
 from collections.abc import Awaitable, Callable
 from contextlib import asynccontextmanager
 from contextvars import ContextVar
 
 PostCommit = Callable[[], Awaitable[None]]
+logger = logging.getLogger(__name__)
 _profundidad = ContextVar("_profundidad", default=0)
 _post_commit_actual = ContextVar("_post_commit_actual", default=None)
 
@@ -152,18 +154,35 @@ async def transaccion_banco(*, persistir: bool = True):
         depth_token = _profundidad.set(1)
         pc_token = _post_commit_actual.set(callbacks)
         snapshot = None
+        snapshot_anterior = copy.deepcopy(bot.banco) if persistir else None
         try:
             yield bot
-        finally:
+        except BaseException:
+            _post_commit_actual.reset(pc_token)
+            _profundidad.reset(depth_token)
+            raise
+        else:
             if persistir:
                 snapshot = copy.deepcopy(bot.banco)
             _post_commit_actual.reset(pc_token)
             _profundidad.reset(depth_token)
+
+        if snapshot is not None:
+            try:
+                async with bot._banco_persist_lock:
+                    await asyncio.to_thread(guardar_json_atomico, ruta_banco(), snapshot)
+            except Exception:
+                bot.banco.clear()
+                if snapshot_anterior is not None:
+                    bot.banco.update(snapshot_anterior)
+                raise
+
     if snapshot is not None:
-        async with bot._banco_persist_lock:
-            await asyncio.to_thread(guardar_json_atomico, ruta_banco(), snapshot)
         for callback in callbacks:
-            await callback()
+            try:
+                await callback()
+            except Exception:
+                logger.exception("Error en callback posterior a persistir banco")
 ```
 
 Todos los slash commands se envuelven al registrarse:

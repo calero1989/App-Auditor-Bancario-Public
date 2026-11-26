@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import copy
 import importlib.util
 import pathlib
 import sys
@@ -88,6 +89,48 @@ class TransaccionBancoTests(unittest.IsolatedAsyncioTestCase):
 
         await operacion()
         self.assertEqual(orden, ["persist", "ack"])
+
+    async def test_fallo_persistencia_revierte_estado_en_memoria(self):
+        self.mod.estado.cuentas["usuario"] = {"balance": 100}
+
+        def guardar(_cuentas: dict) -> None:
+            raise OSError("disco lleno")
+
+        self.mod.guardar_banco = guardar
+
+        async def operacion():
+            async with self.mod.transaccion_banco():
+                self.mod.estado.cuentas["usuario"]["balance"] += 50
+                self.mod.estado.cuentas["nuevo"] = {"balance": 25}
+
+        with self.assertRaises(OSError):
+            await operacion()
+
+        self.assertEqual(self.mod.estado.cuentas, {"usuario": {"balance": 100}})
+
+    async def test_error_post_commit_no_falla_transaccion_persistida(self):
+        guardados: list[dict] = []
+
+        def guardar(cuentas: dict) -> None:
+            guardados.append(copy.deepcopy(cuentas))
+
+        self.mod.guardar_banco = guardar
+
+        async def operacion():
+            async with self.mod.transaccion_banco():
+                self.mod.estado.cuentas["usuario"] = {"balance": 100}
+
+                async def ack():
+                    raise RuntimeError("discord no disponible")
+
+                self.mod.al_confirmar_persistencia(ack)
+
+        with self.assertLogs(self.mod.logger, level="ERROR") as logs:
+            await operacion()
+
+        self.assertEqual(self.mod.estado.cuentas, {"usuario": {"balance": 100}})
+        self.assertEqual(guardados, [{"usuario": {"balance": 100}}])
+        self.assertIn("Error en callback posterior a persistir banco", logs.output[0])
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 """
 Serialización de mutaciones del banco en memoria.
-Evita condiciones de carrera; el fsync corre fuera del lock de mutación (hilo).
+Evita condiciones de carrera; el fsync corre en hilo antes de liberar la mutación.
 Soporta transacciones anidadas (ContextVar), serializa guardados concurrentes
 y permite ACK de éxito solo tras confirmar persistencia.
 Los callbacks de botones/menús persistentes deben usar transaccion_banco()
@@ -11,6 +11,7 @@ from __future__ import annotations
 import asyncio
 import copy
 import functools
+import logging
 from collections.abc import Awaitable, Callable
 from contextlib import asynccontextmanager
 from contextvars import ContextVar
@@ -18,6 +19,7 @@ from contextvars import ContextVar
 from discord import app_commands
 
 PostCommit = Callable[[], Awaitable[None]]
+logger = logging.getLogger(__name__)
 
 
 class EstadoBanco:
@@ -80,19 +82,35 @@ async def transaccion_banco(*, persistir: bool = True):
         depth_token = _profundidad_transaccion_banco.set(1)
         tx_token = _transaccion_actual.set(tx)
         snapshot = None
+        snapshot_anterior = copy.deepcopy(estado.cuentas) if persistir else None
         try:
             yield estado
-        finally:
+        except BaseException:
+            _transaccion_actual.reset(tx_token)
+            _profundidad_transaccion_banco.reset(depth_token)
+            raise
+        else:
             if persistir:
                 snapshot = copy.deepcopy(estado.cuentas)
             _transaccion_actual.reset(tx_token)
             _profundidad_transaccion_banco.reset(depth_token)
 
+        if snapshot is not None:
+            try:
+                async with estado._persist_lock:
+                    await asyncio.to_thread(guardar_banco, snapshot)
+            except Exception:
+                estado.cuentas.clear()
+                if snapshot_anterior is not None:
+                    estado.cuentas.update(snapshot_anterior)
+                raise
+
     if snapshot is not None:
-        async with estado._persist_lock:
-            await asyncio.to_thread(guardar_banco, snapshot)
         for callback in tx._post_commit:
-            await callback()
+            try:
+                await callback()
+            except Exception:
+                logger.exception("Error en callback posterior a persistir banco")
 
 
 def envolver_arbol_comandos(tree: app_commands.CommandTree) -> None:
