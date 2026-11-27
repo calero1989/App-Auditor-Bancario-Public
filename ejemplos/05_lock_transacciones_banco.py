@@ -83,10 +83,12 @@ async def transaccion_banco(*, persistir: bool = True):
         try:
             yield estado
         finally:
-            if persistir:
-                snapshot = copy.deepcopy(estado.cuentas)
-            _transaccion_actual.reset(tx_token)
-            _profundidad_transaccion_banco.reset(depth_token)
+            try:
+                if persistir:
+                    snapshot = copy.deepcopy(estado.cuentas)
+            finally:
+                _transaccion_actual.reset(tx_token)
+                _profundidad_transaccion_banco.reset(depth_token)
 
     if snapshot is not None:
         async with estado._persist_lock:

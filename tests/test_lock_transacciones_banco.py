@@ -89,6 +89,34 @@ class TransaccionBancoTests(unittest.IsolatedAsyncioTestCase):
         await operacion()
         self.assertEqual(orden, ["persist", "ack"])
 
+    async def test_error_creando_snapshot_restablece_contexto(self):
+        class NoSnapshot:
+            def __deepcopy__(self, _memo):
+                raise RuntimeError("snapshot roto")
+
+        guardados: list[dict] = []
+
+        def guardar(cuentas: dict) -> None:
+            guardados.append(dict(cuentas))
+
+        self.mod.guardar_banco = guardar
+
+        with self.assertRaises(RuntimeError):
+            async with self.mod.transaccion_banco():
+                self.mod.estado.cuentas["u"] = {"balance": 1, "ref": NoSnapshot()}
+
+        async def ack():
+            pass
+
+        with self.assertRaises(RuntimeError):
+            self.mod.al_confirmar_persistencia(ack)
+
+        self.mod.estado.cuentas.clear()
+        async with self.mod.transaccion_banco():
+            self.mod.estado.cuentas["v"] = {"balance": 99}
+
+        self.assertEqual(guardados, [{"v": {"balance": 99}}])
+
 
 if __name__ == "__main__":
     unittest.main()
