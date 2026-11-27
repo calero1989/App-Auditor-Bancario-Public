@@ -63,6 +63,7 @@ class TransaccionBancoTests(unittest.IsolatedAsyncioTestCase):
                 self.mod.estado.cuentas["usuario"] = {"balance": 100}
                 async with self.mod.transaccion_banco():
                     self.mod.estado.cuentas["usuario"]["balance"] += 50
+                self.mod.confirmar_transaccion_banco()
 
         await asyncio.wait_for(operacion_anidada(), timeout=1)
 
@@ -85,9 +86,37 @@ class TransaccionBancoTests(unittest.IsolatedAsyncioTestCase):
                     orden.append("ack")
 
                 self.mod.al_confirmar_persistencia(ack)
+                self.mod.confirmar_transaccion_banco()
 
         await operacion()
         self.assertEqual(orden, ["persist", "ack"])
+
+    async def test_return_sin_confirmar_revierte_y_no_persiste(self):
+        self.mod.estado.cuentas["usuario"] = {"balance": 100}
+        guardados: list[dict] = []
+        orden: list[str] = []
+
+        def guardar(cuentas: dict) -> None:
+            guardados.append(dict(cuentas))
+
+        self.mod.guardar_banco = guardar
+
+        async def operacion_fallida():
+            async with self.mod.transaccion_banco():
+                self.mod.estado.cuentas["usuario"]["balance"] = -999
+
+                async def ack():
+                    orden.append("ack")
+
+                self.mod.al_confirmar_persistencia(ack)
+                return "saldo insuficiente"
+
+        resultado = await operacion_fallida()
+
+        self.assertEqual(resultado, "saldo insuficiente")
+        self.assertEqual(self.mod.estado.cuentas, {"usuario": {"balance": 100}})
+        self.assertEqual(guardados, [])
+        self.assertEqual(orden, [])
 
 
 if __name__ == "__main__":
